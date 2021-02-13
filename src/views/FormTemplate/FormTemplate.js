@@ -20,7 +20,6 @@ import avatar from "assets/img/help/form-help-icon-01.png";
 import bgImage from "assets/img/sidebar-2.jpg";
 
 import { forms, fields, subforms } from 'variables/formData'
-const form = forms[0]
 
 const styles = {
   cardCategoryWhite: {
@@ -46,9 +45,10 @@ const useStyles = makeStyles(styles);
 export default function FormTemplate() {
     const classes = useStyles();
  
-    const [image, setImage] = React.useState(bgImage);
-    const [color, setColor] = React.useState("blue");
+    const [formIndex, setFormIndex] = React.useState(0);
     const [fixedClasses, setFixedClasses] = React.useState("dropdown");
+
+    const form = forms[formIndex]
 
     const handleFixedClick = () => {
     if (fixedClasses === "dropdown") {
@@ -56,7 +56,15 @@ export default function FormTemplate() {
     } else {
         setFixedClasses("dropdown");
     }
-    };  
+    }; 
+    
+    const handleNextClick = () => {
+      if (formIndex === 0) {
+          setFormIndex(1)
+      } else {
+        setFormIndex(0)
+      }
+      }; 
 
 
   return (
@@ -86,7 +94,7 @@ export default function FormTemplate() {
             </CardBody>
             <CardFooter>
               <Button color="">Back</Button>
-              <Button color="success">Next</Button>
+              <Button color="success" onClick={handleNextClick}>Next</Button>
             </CardFooter>
           </Card>
           <GridContainer>
