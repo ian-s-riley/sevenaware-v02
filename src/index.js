@@ -25,10 +25,10 @@ import Admin from "layouts/Admin.js";
 
 import "assets/css/material-dashboard-react.css?v=1.9.0";
 
-//aws amplify for auth
-import Amplify from 'aws-amplify';
-import config from './aws-exports';
-Amplify.configure(config);
+// //aws amplify for auth
+// import Amplify from 'aws-amplify';
+// import config from './aws-exports';
+// Amplify.configure(config);
 
 const hist = createBrowserHistory();
 
