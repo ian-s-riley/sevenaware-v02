@@ -1,5 +1,6 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
+import { withAuthenticator } from '@aws-amplify/ui-react'
 // creates a beautiful scrollbar
 import PerfectScrollbar from "perfect-scrollbar";
 import "perfect-scrollbar/css/perfect-scrollbar.css";
@@ -39,7 +40,7 @@ const switchRoutes = (
 
 const useStyles = makeStyles(styles);
 
-export default function Admin({ ...rest }) {
+function Admin({ ...rest }) {
   // styles
   const classes = useStyles();
   // ref to help us initialize PerfectScrollbar on windows devices
@@ -111,3 +112,5 @@ export default function Admin({ ...rest }) {
     </div>
   );
 }
+
+export default (Admin);
