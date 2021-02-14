@@ -17,9 +17,8 @@ import Subform from 'components/Subform/Subform'
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import avatar from "assets/img/help/form-help-icon-01.png";
-import bgImage from "assets/img/sidebar-2.jpg";
 
-import { forms, fields, subforms } from 'variables/formData'
+import { forms } from 'variables/formData'
 
 const styles = {
   cardCategoryWhite: {
@@ -49,6 +48,8 @@ export default function FormTemplate() {
     const [fixedClasses, setFixedClasses] = React.useState("dropdown");
 
     const form = forms[formIndex]
+    const fields = form.fields
+    const subforms = form.subforms
 
     const handleFixedClick = () => {
     if (fixedClasses === "dropdown") {
