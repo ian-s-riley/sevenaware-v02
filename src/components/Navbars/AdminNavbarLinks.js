@@ -1,4 +1,5 @@
 import React from "react";
+import {LinkContainer} from 'react-router-bootstrap'
 import classNames from "classnames";
 import { Hub, Auth } from "aws-amplify";
 // @material-ui/core components
@@ -28,6 +29,7 @@ export default function AdminNavbarLinks() {
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
+
   const handleClickNotification = event => {
     if (openNotification && openNotification.contains(event.target)) {
       setOpenNotification(null);
@@ -35,9 +37,11 @@ export default function AdminNavbarLinks() {
       setOpenNotification(event.currentTarget);
     }
   };
+
   const handleCloseNotification = () => {
     setOpenNotification(null);
   };
+
   const handleClickProfile = event => {
     if (openProfile && openProfile.contains(event.target)) {
       setOpenProfile(null);
@@ -45,12 +49,15 @@ export default function AdminNavbarLinks() {
       setOpenProfile(event.currentTarget);
     }
   };
+
   const handleCloseProfile = () => {
     setOpenProfile(null);
   };
+
   const handleLogout = () => {
     Auth.signOut();
   };
+
   return (
     <div>
       <div className={classes.searchWrapper}>
@@ -197,12 +204,14 @@ export default function AdminNavbarLinks() {
               <Paper>
                 <ClickAwayListener onClickAway={handleCloseProfile}>
                   <MenuList role="menu">
-                    <MenuItem
-                      onClick={handleCloseProfile}
-                      className={classes.dropdownItem}
-                    >
-                      Profile
-                    </MenuItem>
+                    <LinkContainer to="/admin/user">
+                      <MenuItem
+                        onClick={handleCloseProfile}
+                        className={classes.dropdownItem}
+                      >
+                        Profile
+                      </MenuItem>
+                    </LinkContainer>
                     <MenuItem
                       onClick={handleCloseProfile}
                       className={classes.dropdownItem}

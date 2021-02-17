@@ -63,51 +63,6 @@ const forms = [
     }
 ]
   
-const fields = [
-    {
-        id: 'field-1',
-        name: "Field 1",
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        value: 'f1 value',
-        disabled: false,
-        md: '6'
-    },
-    {
-        id: 'field-2',
-        name: "Field 2",
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        value: 'f1 value',
-        disabled: false,
-        md: '6'
-    },
-    {
-        id: 'field-3',
-        name: "Field 3 (disabled - full width)",
-        description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        value: '222-222-222',
-        disabled: true,
-        md: '12'
-    }
-]
-
-const subforms = [
-    {
-        id: 'form-3',
-        name: "Form 3",
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    },
-    {
-        id: 'form-4',
-        name: "Form 4",
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    },
-    {
-        id: 'form-5',
-        name: "Form 5",
-        description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    }
-]
-
 module.exports = {
     forms
 };

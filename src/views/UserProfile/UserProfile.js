@@ -13,6 +13,7 @@ import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
+import { users } from 'variables/userData'
 import avatar from "assets/img/faces/marc.jpg";
 
 const styles = {
@@ -38,53 +39,77 @@ const useStyles = makeStyles(styles);
 
 export default function UserProfile() {
   const classes = useStyles();
+  const user = users[0]
+
   return (
     <div>
       <GridContainer>
         <GridItem xs={12} sm={12} md={8}>
           <Card>
             <CardHeader color="primary">
-              <h4 className={classes.cardTitleWhite}>Edit Profile</h4>
-              <p className={classes.cardCategoryWhite}>Complete your profile</p>
+              <h4 className={classes.cardTitleWhite}>{user.firstName} {user.lastName}</h4>
             </CardHeader>
             <CardBody>
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={5}>
+            <GridContainer>
+                <GridItem xs={12} sm={12} md={6}>
                   <CustomInput
-                    labelText="Company (disabled)"
-                    id="company-disabled"
+                    labelText="Company Name"
+                    id="firstName"
+                    inputProps={{value: user.company}}
                     formControlProps={{
                       fullWidth: true
                     }}
-                    inputProps={{
-                      disabled: true
+                  />
+                </GridItem>
+                <GridItem xs={12} sm={12} md={6}>
+                  <CustomInput
+                    labelText="(DBA)"
+                    id="dba"
+                    inputProps={{value: user.dba}}
+                    formControlProps={{
+                      fullWidth: true
+                    }}
+                  />
+                </GridItem>
+              </GridContainer>   
+              <GridContainer>                
+                <GridItem xs={12} sm={12} md={3}>
+                  <CustomInput
+                    labelText="First Name"
+                    id="firstName"
+                    inputProps={{value: user.firstName}}
+                    formControlProps={{
+                      fullWidth: true
                     }}
                   />
                 </GridItem>
                 <GridItem xs={12} sm={12} md={3}>
                   <CustomInput
-                    labelText="Username"
-                    id="username"
+                    labelText="Last Name"
+                    id={user.lastname}
+                    inputProps={{value: user.lastName}}
                     formControlProps={{
                       fullWidth: true
                     }}
                   />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
+                <GridItem xs={12} sm={12} md={6}>
                   <CustomInput
                     labelText="Email address"
-                    id="email-address"
+                    id="email"
+                    inputProps={{value: user.email}}
                     formControlProps={{
                       fullWidth: true
                     }}
                   />
                 </GridItem>
               </GridContainer>
-              <GridContainer>
+              <GridContainer>                
                 <GridItem xs={12} sm={12} md={6}>
                   <CustomInput
-                    labelText="First Name"
-                    id="first-name"
+                    labelText="Address"
+                    id="address1"
+                    inputProps={{value: user.address1}}
                     formControlProps={{
                       fullWidth: true
                     }}
@@ -92,37 +117,41 @@ export default function UserProfile() {
                 </GridItem>
                 <GridItem xs={12} sm={12} md={6}>
                   <CustomInput
-                    labelText="Last Name"
-                    id="last-name"
+                    labelText="Address Line 2"
+                    id="address2"
+                    inputProps={{value: user.address2}}
                     formControlProps={{
                       fullWidth: true
                     }}
                   />
                 </GridItem>
-              </GridContainer>
+              </GridContainer>                         
               <GridContainer>
-                <GridItem xs={12} sm={12} md={4}>
+                <GridItem xs={12} sm={12} md={6}>
                   <CustomInput
                     labelText="City"
                     id="city"
+                    inputProps={{value: user.city}}
                     formControlProps={{
                       fullWidth: true
                     }}
                   />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
+                <GridItem xs={12} sm={12} md={3}>
                   <CustomInput
-                    labelText="Country"
-                    id="country"
+                    labelText="State"
+                    id="state"
+                    inputProps={{value: user.state}}
                     formControlProps={{
                       fullWidth: true
                     }}
                   />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
+                <GridItem xs={12} sm={12} md={3}>
                   <CustomInput
-                    labelText="Postal Code"
-                    id="postal-code"
+                    labelText="Zip Code"
+                    id="zip"
+                    inputProps={{value: user.zip}}
                     formControlProps={{
                       fullWidth: true
                     }}
@@ -133,11 +162,12 @@ export default function UserProfile() {
                 <GridItem xs={12} sm={12} md={12}>
                   <InputLabel style={{ color: "#AAAAAA" }}>About me</InputLabel>
                   <CustomInput
-                    labelText="Lamborghini Mercy, Your chick she so thirsty, I'm in that two seat Lambo."
+                    labelText={user.about}
                     id="about-me"
                     formControlProps={{
                       fullWidth: true
                     }}
+                  
                     inputProps={{
                       multiline: true,
                       rows: 5

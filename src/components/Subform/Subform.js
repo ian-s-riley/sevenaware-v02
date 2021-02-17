@@ -23,25 +23,6 @@ export default function Subform(props) {
         <TableRow className={classes.tableRow}>
             <TableCell className={tableCellClasses}>{props.name}</TableCell>
             <TableCell className={tableCellClasses}>{props.description}</TableCell>
-            <TableCell className={classes.tableActions}>
-                <Tooltip
-                id="tooltip-top-start"
-                title="Complete this form."
-                placement="top"
-                classes={{ tooltip: classes.tooltip }}
-                >
-                <IconButton
-                    aria-label="Close"
-                    className={classes.tableActionButton}
-                >
-                    <Input
-                    className={
-                        classes.tableActionButtonIcon + " " + classes.close
-                    }
-                    />
-                </IconButton>
-                </Tooltip>
-            </TableCell>
         </TableRow>
     );
 }

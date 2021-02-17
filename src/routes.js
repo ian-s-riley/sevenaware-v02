@@ -28,6 +28,7 @@ import TableChart from "@material-ui/icons/TableChart";
 import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
 import FormTemplate from "views/FormTemplate/FormTemplate.js";
+import Forms from 'views/Forms/Forms'
 import Maps from "views/Maps/Maps.js";
 
 const dashboardRoutes = [
@@ -37,6 +38,13 @@ const dashboardRoutes = [
     rtlName: "لوحة القيادة",
     icon: Dashboard,
     component: DashboardPage,
+    layout: "/admin"
+  },
+  {
+    path: "/sections",
+    name: "Forms",
+    icon: TableChart,
+    component: Forms,
     layout: "/admin"
   },
   {
