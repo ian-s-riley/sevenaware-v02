@@ -7,11 +7,9 @@ export const getForm = /* GraphQL */ `
       id
       name
       code
+      order
       description
       parentFormId
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -28,46 +26,13 @@ export const listForms = /* GraphQL */ `
         id
         name
         code
+        order
         description
         parentFormId
-        _version
-        _deleted
-        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
-      startedAt
-    }
-  }
-`;
-export const syncForms = /* GraphQL */ `
-  query SyncForms(
-    $filter: ModelFormFilterInput
-    $limit: Int
-    $nextToken: String
-    $lastSync: AWSTimestamp
-  ) {
-    syncForms(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      lastSync: $lastSync
-    ) {
-      items {
-        id
-        name
-        code
-        description
-        parentFormId
-        _version
-        _deleted
-        _lastChangedAt
-        createdAt
-        updatedAt
-      }
-      nextToken
-      startedAt
     }
   }
 `;
@@ -76,17 +41,19 @@ export const getField = /* GraphQL */ `
     getField(id: $id) {
       id
       name
+      code
       description
+      fieldType
+      order
       value
+      defaultValue
+      options
       userId
       lenderId
       label
       helpText
       image
-      sectionId
-      _version
-      _deleted
-      _lastChangedAt
+      formId
       createdAt
       updatedAt
     }
@@ -102,57 +69,23 @@ export const listFields = /* GraphQL */ `
       items {
         id
         name
+        code
         description
+        fieldType
+        order
         value
+        defaultValue
+        options
         userId
         lenderId
         label
         helpText
         image
-        sectionId
-        _version
-        _deleted
-        _lastChangedAt
+        formId
         createdAt
         updatedAt
       }
       nextToken
-      startedAt
-    }
-  }
-`;
-export const syncFields = /* GraphQL */ `
-  query SyncFields(
-    $filter: ModelFieldFilterInput
-    $limit: Int
-    $nextToken: String
-    $lastSync: AWSTimestamp
-  ) {
-    syncFields(
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      lastSync: $lastSync
-    ) {
-      items {
-        id
-        name
-        description
-        value
-        userId
-        lenderId
-        label
-        helpText
-        image
-        sectionId
-        _version
-        _deleted
-        _lastChangedAt
-        createdAt
-        updatedAt
-      }
-      nextToken
-      startedAt
     }
   }
 `;

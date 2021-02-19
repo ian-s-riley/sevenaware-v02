@@ -1,5 +1,6 @@
 /*eslint-disable*/
 import React, { useState, useEffect } from 'react';
+import classNames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
@@ -14,15 +15,27 @@ import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
 import Danger from "components/Typography/Danger.js";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import MenuItem from "@material-ui/core/MenuItem";
+import MenuList from "@material-ui/core/MenuList";
+import Grow from "@material-ui/core/Grow";
+import Paper from "@material-ui/core/Paper";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import Hidden from "@material-ui/core/Hidden";
+import Poppers from "@material-ui/core/Popper";
 
 // @material-ui/icons
 import Store from "@material-ui/icons/Store";
 import Warning from "@material-ui/icons/Warning";
+import Clear from "@material-ui/icons/Clear";
 import DateRange from "@material-ui/icons/DateRange";
 import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
 import Accessibility from "@material-ui/icons/Accessibility";
-import People from "@material-ui/icons/People";
+import ArrowDropDown from "@material-ui/icons/ArrowDropDown";
+import Person from "@material-ui/icons/Person";
+import Notifications from "@material-ui/icons/Notifications";
+import Dashboard from "@material-ui/icons/Dashboard";
+import Search from "@material-ui/icons/Search";
 
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -39,19 +52,20 @@ import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js"
 const useStyles = makeStyles(styles);
 
 import { users } from 'variables/userData'
-const initialFormState = { name: '', code: '', description: '' }
+const initialFormState = { name: '', code: '', order: 0, description: '', parentFormId:  '' }
 
 export default function Views() {
   const classes = useStyles()
 
+  const [open, setOpen] = useState(null);
   const [display, setDisplay] = useState('list')
   const [forms, setForms] = useState([])
-  const [form, setForm] = useState()
-  const [formData, setFormData] = useState(initialFormState)
+  const [form, setForm] = useState(initialFormState)
+  const [parentForm, setParentForm] = useState('')
 
   const user = users[0]
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Specify how to clean up after this effect:
     return function cleanup() {
       // to stop the warning of calling setState of unmounted component
@@ -75,44 +89,82 @@ export default function Views() {
     setForms(apiData.data.listForms.items);    
   }
 
-  function newForm() {
-    setDisplay('create')
-  }
-
   async function createForm() {
-    if (!formData.name || !formData.code) return
-    const newForm = await API.graphql({ query: createFormMutation, variables: { input: formData } })
-    setForms([...forms, newForm.data.createForm])
-    setFormData(initialFormState);
+    if (!form.name || !form.code) return
+    const formFromAPI = await API.graphql({ query: createFormMutation, variables: { input: form } })
+    const newForm = formFromAPI.data.createForm
+    setForms([...forms, newForm])
+    setForm(initialFormState);
     setDisplay('list')
   }
   
-  async function selectForm(formId) {
-    const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});       
+  async function selectForm({ id }) {
+    const formFromAPI = await API.graphql({ query: getForm, variables: { id  }});       
     const thisForm = formFromAPI.data.getForm    
     setForm(thisForm)
-    console.log(thisForm)
-    setDisplay('edit')
+
+    const thisParentForm = forms.filter(form => form.id === thisForm.parentFormId)    
+    if (thisParentForm[0]) {setParentForm(thisParentForm[0].name)} else { setParentForm('')} 
+
+    setDisplay('edit')    
   }  
 
-  async function saveForm() {
-    if (!formData.name || !formData.code) return;
-    console.log('form', formData)
-    await API.graphql({ query: updateFormMutation, variables: { input: {id: formData.id, name: formData.name, code: formData.code, description: formData.description} } });
-    //await API.graphql({ query: createFormMutation, variables: { input: {id: form.id, name: form.name, description: form.description} } });
-    setFormData(initialFormState);
+  async function updateForm() {
+    if (!form.name || !form.code) return;        
+    await API.graphql({ 
+                        query: updateFormMutation, 
+                        variables: { input: {
+                          id: form.id, 
+                          code: form.code,
+                          name: form.name, 
+                          description: form.description,
+                          parentFormId: form.parentFormId,
+                        }} 
+                      });
+    //console.log('forms', forms)
+    console.log('form', form)    
+    const newFormsArray = forms.filter(updatedForm => updatedForm.id !== form.id);           
+    newFormsArray.push(form)
+    setForms(newFormsArray)
+    setForm(initialFormState);
     setDisplay('list')
   }
 
   async function deleteForm({ id }) {
-    const newFormsArray = forms.filter(form => form.id !== id);
-    setForms(newFormsArray);
-    await API.graphql({ query: deleteFormMutation, variables: { input: { id } }});
+    var result = confirm("Are you sure you want to delete this form?");
+    if (result) {
+      const newFormsArray = forms.filter(form => form.id !== id);
+      setForms(newFormsArray);
+      await API.graphql({ query: deleteFormMutation, variables: { input: { id } }});
+    }        
   }
 
   function handleChange(e) {
       const {id, value} = e.currentTarget;
-      setFormData({ ...formData, [id]: value})      
+      setForm({ ...form, [id]: value})      
+  }
+
+  function handleCancel() {
+    setForm(initialFormState)      
+    setDisplay('list')    
+}  
+
+
+  const handleToggle = event => {
+    if (open && open.contains(event.target)) {
+      setOpen(null);
+    } else {
+      setOpen(event.currentTarget);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(null);
+  };
+
+  function handleSelectParentForm(value, name) {
+    setParentForm(name)
+    setForm({ ...form, parentFormId: value})  
   }
 
   const formList = (
@@ -127,11 +179,11 @@ export default function Views() {
         forms.map(form => (
             <GridItem xs={12} sm={6} md={4} key={form.id}>
                 <Card>
-                    <CardHeader color="success" stats icon onClick={() => selectForm(form.id)}>
+                    <CardHeader color="success" stats icon onClick={() => selectForm(form)}>
                     <CardIcon color="success">
                         <Icon>content_copy</Icon>
                     </CardIcon>
-                    <p className={classes.cardCategory}>{form.id}</p>
+                    <p className={classes.cardCategory}>{form.code}</p>
                     <h3 className={classes.cardTitle}>
                         {form.name}
                     </h3>
@@ -140,8 +192,12 @@ export default function Views() {
                         {form.description}
                     </CardBody>
                     <CardFooter stats>
-                    <button onClick={() => deleteForm(form)}>Delete note</button>
-                  </CardFooter>
+                      <div className={classes.stats}>
+                        Form: {form.id}
+                        <br />
+                        Parent Form: {form.parentFormId}
+                      </div>
+                    </CardFooter>
                 </Card>
             </GridItem>
         ))
@@ -150,7 +206,7 @@ export default function Views() {
       </CardBody>
       <CardFooter>
         <Button 
-          onClick={newForm}
+          onClick={() => setDisplay('create')}
           color="primary"
         >New Form</Button>
       </CardFooter>
@@ -160,7 +216,7 @@ export default function Views() {
   const formDetail = (
     <Card>
       <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>7(a)ware Forms</h4>
+        <h4 className={classes.cardTitleWhite}>Form ID: {form.id}</h4>
       </CardHeader>
       <CardBody>
       <GridContainer>
@@ -174,14 +230,84 @@ export default function Views() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                defaultValue: formData.name,
+                defaultValue: form.name,                
+              }}                           
+            />
+          </GridItem>
+          
+          <GridItem xs={12} sm={12} md={6}
+                       
+          >
+          <CustomInput
+              labelText="Parent Form"
+              id="parentFormId"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                value: parentForm,
                 endAdornment: (
                   <InputAdornment position="end">
-                    <People />
+                    <ArrowDropDown 
+                      onClick={handleToggle}
+                      aria-owns={open ? "menu-list-grow" : null}
+                      aria-haspopup="true" 
+                    >
+                      <Hidden mdUp implementation="css">
+                        <p onClick={handleClose} className={classes.linkText}>
+                          Notification
+                        </p>
+                      </Hidden>
+                    </ArrowDropDown>
+                    <Clear onClick={() => handleSelectParentForm(null, '')} />                    
                   </InputAdornment>
-                )
+                ),
+                disabled: false
               }}              
-            />
+            >                                
+            </CustomInput>
+            <Poppers
+                open={Boolean(open)}
+                anchorEl={open}
+                transition
+                disablePortal
+                className={
+                  classNames({ [classes.popperClose]: !open }) +
+                  " " +
+                  classes.popperNav
+                }
+              >
+                {({ TransitionProps, placement }) => (
+                  <Grow
+                    {...TransitionProps}
+                    id="menu-list-grow"
+                    style={{
+                      transformOrigin:
+                        placement === "bottom" ? "center top" : "center bottom"
+                    }}
+                  >
+                    <Paper>
+                      <ClickAwayListener onClickAway={handleClose}>
+                        <MenuList role="menu">
+                        {
+
+                        forms.filter(parentForm => parentForm.id !== form.id).map(parentForm => (
+                          <MenuItem
+                            key={parentForm.id}
+                            onClick={() => handleSelectParentForm(parentForm.id, parentForm.name)}
+                            className={classes.dropdownItem}
+                          >
+                            {parentForm.name}
+                          </MenuItem>
+                        ))
+                        }  
+                                                  
+                        </MenuList>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                )}
+              </Poppers>
           </GridItem>
           <GridItem xs={12} sm={12} md={6}>
           <CustomInput
@@ -192,8 +318,22 @@ export default function Views() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                defaultValue: formData.code,
+                defaultValue: form.code,                
               }}
+            />
+          </GridItem>
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Order"
+              id="order"
+              name="order"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                defaultValue: form.name,                
+              }}                           
             />
           </GridItem>
         </GridContainer>                   
@@ -206,21 +346,31 @@ export default function Views() {
                 fullWidth: true
               }}
               inputProps={{
-                defaultValue: formData.description,
+                onChange: (event) => handleChange(event),
+                defaultValue: form.description,
                 multiline: true,
                 rows: 5
               }}
-              onChange={e => setFormData({ ...formData, 'description': e.target.value})}
             />
           </GridItem>
         </GridContainer>
       </CardBody>
       <CardFooter>
-        <Button onClick={() => {setDisplay('list')}}>Cancel</Button>
+        <Button onClick={handleCancel}>Cancel</Button>        
+        {
+        display === 'create' ? (
         <Button 
           onClick={createForm}
-          color="primary"
-        >Save</Button>
+          color="success"
+        >Create New Form</Button>
+        ) : (
+          <Button 
+            onClick={updateForm}
+            color="success"
+          >Save</Button>
+        )
+        }
+        <Button color="danger" onClick={() => deleteForm(form)}>Delete</Button>
       </CardFooter>
     </Card>
   )

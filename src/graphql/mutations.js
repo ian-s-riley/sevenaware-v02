@@ -10,11 +10,9 @@ export const createForm = /* GraphQL */ `
       id
       name
       code
+      order
       description
       parentFormId
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -29,11 +27,9 @@ export const updateForm = /* GraphQL */ `
       id
       name
       code
+      order
       description
       parentFormId
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -48,11 +44,9 @@ export const deleteForm = /* GraphQL */ `
       id
       name
       code
+      order
       description
       parentFormId
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -66,17 +60,19 @@ export const createField = /* GraphQL */ `
     createField(input: $input, condition: $condition) {
       id
       name
+      code
       description
+      fieldType
+      order
       value
+      defaultValue
+      options
       userId
       lenderId
       label
       helpText
       image
-      sectionId
-      _version
-      _deleted
-      _lastChangedAt
+      formId
       createdAt
       updatedAt
     }
@@ -90,17 +86,19 @@ export const updateField = /* GraphQL */ `
     updateField(input: $input, condition: $condition) {
       id
       name
+      code
       description
+      fieldType
+      order
       value
+      defaultValue
+      options
       userId
       lenderId
       label
       helpText
       image
-      sectionId
-      _version
-      _deleted
-      _lastChangedAt
+      formId
       createdAt
       updatedAt
     }
@@ -114,17 +112,19 @@ export const deleteField = /* GraphQL */ `
     deleteField(input: $input, condition: $condition) {
       id
       name
+      code
       description
+      fieldType
+      order
       value
+      defaultValue
+      options
       userId
       lenderId
       label
       helpText
       image
-      sectionId
-      _version
-      _deleted
-      _lastChangedAt
+      formId
       createdAt
       updatedAt
     }

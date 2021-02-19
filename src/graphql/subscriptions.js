@@ -7,11 +7,9 @@ export const onCreateForm = /* GraphQL */ `
       id
       name
       code
+      order
       description
       parentFormId
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -23,11 +21,9 @@ export const onUpdateForm = /* GraphQL */ `
       id
       name
       code
+      order
       description
       parentFormId
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -39,11 +35,9 @@ export const onDeleteForm = /* GraphQL */ `
       id
       name
       code
+      order
       description
       parentFormId
-      _version
-      _deleted
-      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -54,17 +48,19 @@ export const onCreateField = /* GraphQL */ `
     onCreateField {
       id
       name
+      code
       description
+      fieldType
+      order
       value
+      defaultValue
+      options
       userId
       lenderId
       label
       helpText
       image
-      sectionId
-      _version
-      _deleted
-      _lastChangedAt
+      formId
       createdAt
       updatedAt
     }
@@ -75,17 +71,19 @@ export const onUpdateField = /* GraphQL */ `
     onUpdateField {
       id
       name
+      code
       description
+      fieldType
+      order
       value
+      defaultValue
+      options
       userId
       lenderId
       label
       helpText
       image
-      sectionId
-      _version
-      _deleted
-      _lastChangedAt
+      formId
       createdAt
       updatedAt
     }
@@ -96,17 +94,19 @@ export const onDeleteField = /* GraphQL */ `
     onDeleteField {
       id
       name
+      code
       description
+      fieldType
+      order
       value
+      defaultValue
+      options
       userId
       lenderId
       label
       helpText
       image
-      sectionId
-      _version
-      _deleted
-      _lastChangedAt
+      formId
       createdAt
       updatedAt
     }

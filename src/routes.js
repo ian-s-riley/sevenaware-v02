@@ -41,7 +41,7 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/sections",
+    path: "/forms",
     name: "Forms",
     icon: TableChart,
     component: Forms,
