@@ -4,8 +4,8 @@ import classNames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
-import { listForms, getForm } from '../../graphql/queries';
-import { createForm as createFormMutation, deleteForm as deleteFormMutation, updateForm as updateFormMutation } from '../../graphql/mutations';
+import { listFields, getField, listForms } from '../../graphql/queries';
+import { createField as createFieldMutation, deleteField as deleteFieldMutation, updateField as updateFieldMutation } from '../../graphql/mutations';
 
 // nodejs library to set properties for components
 import PropTypes from "prop-types";
@@ -51,15 +51,32 @@ import CardFooter from "components/Card/CardFooter.js";
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 const useStyles = makeStyles(styles);
 
-const initialFormState = { name: '', code: '', order: 0, description: '', parentFormId:  '-1', parentForm: '' }
+const initialFieldState = { 
+    name: '',
+    code: '',
+    description: '',
+    fieldType: '',
+    order: 0,
+    value: '',
+    defaultValue: '',
+    options: '',
+    userId: '',
+    lenderId: '',
+    label: '',
+    helpText: '',
+    image: '',
+    formId: '',
+    form: '',
+}
 
-export default function Forms() {
+export default function Fields() {
   const classes = useStyles()
 
   const [open, setOpen] = useState(null);
   const [display, setDisplay] = useState('list')
+  const [fields, setFields] = useState([])
+  const [field, setField] = useState(initialFieldState)
   const [forms, setForms] = useState([])
-  const [form, setForm] = useState(initialFormState)
 
   useEffect(() => {
     // Specify how to clean up after this effect:
@@ -71,6 +88,19 @@ export default function Forms() {
       }
     };
   });
+
+  useEffect(() => {
+    fetchFields();
+  }, []);
+
+  async function fetchFields() {
+    const apiData = await API.graphql({ query: listFields });
+    const fieldsFromAPI = apiData.data.listFields.items;
+    await Promise.all(fieldsFromAPI.map(async field => {
+      return field;
+    }))
+    setFields(apiData.data.listFields.items);    
+  }
 
   useEffect(() => {
     fetchForms();
@@ -85,64 +115,72 @@ export default function Forms() {
     setForms(apiData.data.listForms.items);    
   }
 
-  async function createForm() {
-    if (!form.name || !form.code) return
-    const formFromAPI = await API.graphql({ query: createFormMutation, variables: { input: form } })
-    const newForm = formFromAPI.data.createForm
-    setForms([...forms, newForm])
-    setForm(initialFormState);
+  async function createField() {
+    if (!field.name || !field.code) return
+    const fieldFromAPI = await API.graphql({ query: createFieldMutation, variables: { input: field } })
+    const newField = fieldFromAPI.data.createField
+    setFields([...fields, newField])
+    setField(initialFieldState);
     setDisplay('list')
   }
   
-  async function selectForm({ id }) {
-    const formFromAPI = await API.graphql({ query: getForm, variables: { id  }});       
-    const thisForm = formFromAPI.data.getForm    
-    setForm(thisForm)
+  async function selectField({ id }) {
+    const fieldFromAPI = await API.graphql({ query: getField, variables: { id  }});       
+    const thisField = fieldFromAPI.data.getField    
+    setField(thisField)
     setDisplay('edit')    
   }  
 
-  async function updateForm() {
-    if (!form.name || !form.code) return;        
+  async function updateField() {
+    if (!field.name || !field.code) return;        
     await API.graphql({ 
-                        query: updateFormMutation, 
+                        query: updateFieldMutation, 
                         variables: { input: {
-                          id: form.id, 
-                          code: form.code,
-                          name: form.name, 
-                          order: form.order, 
-                          description: form.description,
-                          parentFormId: form.parentFormId,
-                          parentForm: form.parentForm,
+                            id: field.id, 
+                            name: field.name,
+                            code: field.code,
+                            description: field.description,
+                            fieldType: field.fieldType,
+                            order: field.order,
+                            value: field.value,
+                            defaultValue: field.defaultValue,
+                            options: field.options,
+                            userId: field.userId,
+                            lenderId: field.lenderId,
+                            label: field.label,
+                            helpText: field.helpText,
+                            image: field.image,
+                            formId: field.formId,
+                            form: field.form,
                         }} 
-                      });
-    const newFormsArray = forms.filter(updatedForm => updatedForm.id !== form.id);           
-    newFormsArray.push(form)
-    setForms(newFormsArray)
-    setForm(initialFormState);
+                      }); 
+    const newFieldsArray = fields.filter(updatedField => updatedField.id !== field.id);           
+    newFieldsArray.push(field)
+    setFields(newFieldsArray)
+    setField(initialFieldState);
     setDisplay('list')
   }
 
-  async function deleteForm({ id }) {
-    var result = confirm("Are you sure you want to delete this form?");
+  async function deleteField({ id }) {
+    var result = confirm("Are you sure you want to delete this field?");
     if (result) {      
-      await API.graphql({ query: deleteFormMutation, variables: { input: { id } }});
-      const newFormsArray = forms.filter(form => form.id !== id);
-      setForms(newFormsArray);
-      setForm(initialFormState);
-      setDisplay('list')
+      await API.graphql({ query: deleteFieldMutation, variables: { input: { id } }});
+      const newFieldsArray = fields.filter(field => field.id !== id);
+      setFields(newFieldsArray);
+      setField(initialFieldState)      
+      setDisplay('list')   
     }        
   }
 
   function handleChange(e) {
       const {id, value} = e.currentTarget;
-      setForm({ ...form, [id]: value})      
+      setField({ ...field, [id]: value})      
   }
 
   function handleCancel() {
-      setForm(initialFormState)      
+      setField(initialFieldState)      
       setDisplay('list')    
   }  
-
 
   const handleToggle = event => {
     if (open && open.contains(event.target)) {
@@ -156,40 +194,39 @@ export default function Forms() {
     setOpen(null);
   };
 
-  function handleSelectParentForm(value, name) {
-    //setParentForm(name)
-    setForm({ ...form, parentFormId: value, parentForm: name})  
+  function handleSelectForm(value, name) {
+    setField({ ...field, formId: value, form: name})  
   }
 
-  const formList = (
+  const fieldList = (
     <Card>
-      <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>7(a)ware Form List</h4>
+      <CardHeader color="warning">
+        <h4 className={classes.cardTitleWhite}>7(a)ware Field List</h4>
       </CardHeader>
       <CardBody>
     
     <GridContainer>
         {
-        forms.map(form => (
-            <GridItem xs={12} sm={6} md={4} key={form.id}>
+        fields.map(field => (
+            <GridItem xs={12} sm={6} md={3} key={field.id}>
                 <Card>
-                    <CardHeader color="success" stats icon onClick={() => selectForm(form)}>
-                    <CardIcon color="success">
+                    <CardHeader color="info" stats icon onClick={() => selectField(field)}>
+                    <CardIcon color="info">
                         <Icon>content_copy</Icon>
                     </CardIcon>
-                    <p className={classes.cardCategory}>{form.code}</p>
+                    <p className={classes.cardCategory}>{field.code}</p>
                     <h3 className={classes.cardTitle}>
-                        {form.name}
+                        {field.name}
                     </h3>
                     </CardHeader>
                     <CardBody>
-                        {form.description}
+                        {field.description}
                     </CardBody>
                     <CardFooter stats>
                       <div className={classes.stats}>
-                        Form: {form.id}
+                        Field: {field.id}
                         <br />
-                        Parent Form: {form.parentForm}
+                        Parent Form: {field.form}
                       </div>
                     </CardFooter>
                 </Card>
@@ -201,22 +238,22 @@ export default function Forms() {
       <CardFooter>
         <Button 
           onClick={() => setDisplay('create')}
-          color="primary"
-        >New Form</Button>
+          color="warning"
+        >New Field</Button>
       </CardFooter>
       </Card>
   )
 
-  const formDetail = (
+  const fieldDetail = (
     <Card>
-      <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>Form ID: {form.id}</h4>
+      <CardHeader color="warning">
+        <h4 className={classes.cardTitleWhite}>Field ID: {field.id}</h4>
       </CardHeader>
       <CardBody>
       <GridContainer>
           <GridItem xs={12} sm={12} md={6}>
             <CustomInput
-              labelText="Form Name"
+              labelText="Field Name"
               id="name"
               name="name"
               formControlProps={{
@@ -224,22 +261,20 @@ export default function Forms() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                defaultValue: form.name,                
+                defaultValue: field.name,                
               }}                           
             />
           </GridItem>
           
-          <GridItem xs={12} sm={12} md={6}
-                       
-          >
+          <GridItem xs={12} sm={12} md={6}>
           <CustomInput
               labelText="Parent Form"
-              id="parentFormId"
+              id="formId"
               formControlProps={{
                 fullWidth: true
               }}
               inputProps={{
-                value: form.parentForm,
+                value: field.form,
                 endAdornment: (
                   <InputAdornment position="end">
                     <ArrowDropDown 
@@ -253,7 +288,7 @@ export default function Forms() {
                         </p>
                       </Hidden>
                     </ArrowDropDown>
-                    <Clear onClick={() => handleSelectParentForm(null, '')} />                    
+                    <Clear onClick={() => handleSelectForm(null, '')} />                    
                   </InputAdornment>
                 ),
                 disabled: false
@@ -285,17 +320,16 @@ export default function Forms() {
                         <MenuList role="menu">
                         {
 
-                        forms.filter(parentForm => parentForm.id !== form.id).map(parentForm => (
+                        forms.map(form => (
                           <MenuItem
-                            key={parentForm.id}
-                            onClick={() => handleSelectParentForm(parentForm.id, parentForm.name)}
+                            key={form.id}
+                            onClick={() => handleSelectForm(form.id, form.name)}
                             className={classes.dropdownItem}
                           >
-                            {parentForm.name}
+                            {form.name}
                           </MenuItem>
                         ))
-                        }  
-                                                  
+                        }                                                    
                         </MenuList>
                       </ClickAwayListener>
                     </Paper>
@@ -312,7 +346,7 @@ export default function Forms() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                defaultValue: form.code,                
+                defaultValue: field.code,                
               }}
             />
           </GridItem>
@@ -326,7 +360,7 @@ export default function Forms() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                defaultValue: form.order,                
+                defaultValue: field.order,                
               }}                           
             />
           </GridItem>
@@ -341,7 +375,7 @@ export default function Forms() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                defaultValue: form.description,
+                defaultValue: field.description,
                 multiline: true,
                 rows: 5
               }}
@@ -354,22 +388,22 @@ export default function Forms() {
         {
         display === 'create' ? (
         <Button 
-          onClick={createForm}
+          onClick={createField}
           color="success"
-        >Create New Form</Button>
+        >Create New Field</Button>
         ) : (
           <Button 
-            onClick={updateForm}
+            onClick={updateField}
             color="success"
           >Save</Button>
         )
         }
-        <Button color="danger" onClick={() => deleteForm(form)}>Delete</Button>
+        <Button color="danger" onClick={() => deleteField(field)}>Delete</Button>
       </CardFooter>
     </Card>
   )
   
   return (
-    display === 'list' ? formList : formDetail
+    display === 'list' ? fieldList : fieldDetail
   );
 }

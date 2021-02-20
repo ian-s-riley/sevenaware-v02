@@ -29,6 +29,7 @@ import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
 import FormTemplate from "views/FormTemplate/FormTemplate.js";
 import Forms from 'views/Forms/Forms'
+import Fields from 'views/Fields/Fields'
 import Maps from "views/Maps/Maps.js";
 
 const dashboardRoutes = [
@@ -45,6 +46,13 @@ const dashboardRoutes = [
     name: "Forms",
     icon: TableChart,
     component: Forms,
+    layout: "/admin"
+  },
+  {
+    path: "/fields",
+    name: "Fields",
+    icon: TableChart,
+    component: Fields,
     layout: "/admin"
   },
   {

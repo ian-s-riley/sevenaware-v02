@@ -1,4 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
+import classNames from "classnames";
+
+//AWS Amplify GraphQL libraries
+import { API } from 'aws-amplify';
+import { listFields, getForm, listForms } from '../../graphql/queries';
+
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -18,7 +24,7 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import avatar from "assets/img/help/form-help-icon-01.png";
 
-import { forms } from 'variables/formData'
+import { TableCell, TableRow } from '@material-ui/core';
 
 const styles = {
   cardCategoryWhite: {
@@ -40,32 +46,65 @@ const styles = {
 };
 
 const useStyles = makeStyles(styles); 
+const initialFormState = { name: '' }
 
 export default function FormTemplate() {
     const classes = useStyles();
  
-    const [formIndex, setFormIndex] = React.useState(0);
-    const [fixedClasses, setFixedClasses] = React.useState("dropdown");
+    const [id, setId] = useState('eb614f56-dc15-4d08-a76f-26e11e584518');
+    const [fixedClasses, setFixedClasses] = useState("dropdown");
 
-    const form = forms[formIndex]
-    const fields = form.fields
-    const subforms = form.subforms
+    const [form, setForm] = useState(initialFormState)
+    const [fields, setFields] = useState([])
+    const [subforms, setSubforms] = useState([])
+    const [formStack, setformStack] = useState([id])
+
+    // Create a new array based on current state:
+    // let newStack = [...formStack];
+    // newStack.push({ value: id });
+    // setformStack(newStack);
+    // console.log(newStack)
+
+    useEffect(() => {
+      fetchForm();
+      fetchFields();
+      fetchSubforms();
+    }, []);
+  
+    async function fetchForm() {
+      //console.log('thisFormId', thisFormId)
+      //console.log('formStack', formStack)
+      const formFromAPI = await API.graphql({ query: getForm, variables: { id  }});            
+      const thisForm = formFromAPI.data.getForm    
+      setForm(thisForm)
+    }
+
+    async function fetchFields() {
+      //const apiData = await API.graphql({ query: listFields, filter: {formId: {eq: "eb614f56-dc15-4d08-a76f-26e11e584518"}} });
+      const apiData = await API.graphql({ query: listFields });
+      const fieldsFromAPI = apiData.data.listFields.items;
+      const formFields = fieldsFromAPI.filter(filteredFields => filteredFields.formId === id);
+      setFields(formFields);    
+    }
+
+    async function fetchSubforms() {
+      const apiData = await API.graphql({ query: listForms });
+      const formsFromAPI = apiData.data.listForms.items;
+      const formSubforms = formsFromAPI.filter(filteredForms => filteredForms.parentFormId === id);
+      setSubforms(formSubforms);    
+    }
 
     const handleFixedClick = () => {
     if (fixedClasses === "dropdown") {
         setFixedClasses("dropdown show");
     } else {
-        setFixedClasses("dropdown");
+         setFixedClasses("dropdown");
     }
     }; 
     
     const handleNextClick = () => {
-      if (formIndex === 0) {
-          setFormIndex(1)
-      } else {
-        setFormIndex(0)
-      }
-      }; 
+      setId('7eddfb11-b2f7-44a6-b127-b535690bd421')
+    }; 
 
 
   return (
@@ -79,27 +118,28 @@ export default function FormTemplate() {
             </CardHeader>
             <CardBody>
               <GridContainer>
-                {
+              {
                   fields.map(field => (
                     <Field
                       id={field.id}
                       name={field.name}
                       description={field.description}
                       value={field.value}
-                      disabled={field.disabled}
-                      md={field.md}
+                      disabled={false}
+                      md={6}
+                      key={field.id}
                     />
                   ))
-                }                
+                }                   
               </GridContainer>        
             </CardBody>
             <CardFooter>
-              <Button color="">Back</Button>
+              <Button color="info">Back</Button>
               <Button color="success" onClick={handleNextClick}>Next</Button>
             </CardFooter>
           </Card>
           <GridContainer>
-            <GridItem xs={12} sm={12} md={12}>
+          <GridItem xs={12} sm={12} md={12}>
                 <Card>
                     <CardHeader color="warning">
                     <h4 className={classes.cardTitleWhite}>Subforms</h4>
@@ -114,6 +154,7 @@ export default function FormTemplate() {
                         subforms.map(subform => (
                           <Subform
                             id={subform.id}
+                            key={subform.id}
                             name={subform.name}
                             description={subform.description}
                           />
@@ -134,10 +175,10 @@ export default function FormTemplate() {
               </a>
             </CardAvatar>
             <CardBody profile>
-              <h6 className={classes.cardCategory}>{form.helpCategory}</h6>
-              <h4 className={classes.cardTitle}>{form.helpTitle}</h4>
+              <h6 className={classes.cardCategory}>form.helpCategory</h6>
+              <h4 className={classes.cardTitle}>form.helpTitle</h4>
               <p className={classes.description}>
-                {form.helpDescription}
+                form.helpDescription
               </p>
               <Button color="success" round>
                 more...
@@ -147,7 +188,7 @@ export default function FormTemplate() {
         </GridItem>
       </GridContainer>
       <FixedHelp
-          legal={form.legal}
+          legal='form.legal'
           handleFixedClick={handleFixedClick}
           fixedClasses={fixedClasses}
         />

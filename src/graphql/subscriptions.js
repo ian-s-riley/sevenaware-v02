@@ -9,7 +9,12 @@ export const onCreateForm = /* GraphQL */ `
       code
       order
       description
+      helpCategory
+      helpTitle
+      helpDescription
+      legal
       parentFormId
+      parentForm
       createdAt
       updatedAt
     }
@@ -23,7 +28,12 @@ export const onUpdateForm = /* GraphQL */ `
       code
       order
       description
+      helpCategory
+      helpTitle
+      helpDescription
+      legal
       parentFormId
+      parentForm
       createdAt
       updatedAt
     }
@@ -37,7 +47,12 @@ export const onDeleteForm = /* GraphQL */ `
       code
       order
       description
+      helpCategory
+      helpTitle
+      helpDescription
+      legal
       parentFormId
+      parentForm
       createdAt
       updatedAt
     }
@@ -61,6 +76,7 @@ export const onCreateField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }
@@ -84,6 +100,7 @@ export const onUpdateField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }
@@ -107,6 +124,7 @@ export const onDeleteField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }

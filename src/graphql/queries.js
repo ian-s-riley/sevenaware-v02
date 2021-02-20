@@ -9,7 +9,12 @@ export const getForm = /* GraphQL */ `
       code
       order
       description
+      helpCategory
+      helpTitle
+      helpDescription
+      legal
       parentFormId
+      parentForm
       createdAt
       updatedAt
     }
@@ -28,7 +33,12 @@ export const listForms = /* GraphQL */ `
         code
         order
         description
+        helpCategory
+        helpTitle
+        helpDescription
+        legal
         parentFormId
+        parentForm
         createdAt
         updatedAt
       }
@@ -54,6 +64,7 @@ export const getField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }
@@ -82,6 +93,7 @@ export const listFields = /* GraphQL */ `
         helpText
         image
         formId
+        form
         createdAt
         updatedAt
       }

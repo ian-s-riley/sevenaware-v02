@@ -4,7 +4,12 @@ type Form @model @auth(rules: [{allow: public}]) {
   code: String
   order: Int
   description: String
+  helpCategory: String
+  helpTitle: String
+  helpDescription: String
+  legal: String
   parentFormId: String
+  parentForm: String
 }
 
 type Field @model @auth(rules: [{allow: public}]) {
@@ -23,5 +28,6 @@ type Field @model @auth(rules: [{allow: public}]) {
   helpText: String
   image: String
   formId: String
+  form: String
 }
  

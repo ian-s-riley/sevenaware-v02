@@ -54,6 +54,10 @@ export default function AdminNavbarLinks() {
     setOpenProfile(null);
   };
 
+  const handleProfile = () => {
+    setOpenProfile(null);
+  };
+
   const handleLogout = () => {
     Auth.signOut();
   };
@@ -76,18 +80,6 @@ export default function AdminNavbarLinks() {
           <Search />
         </Button>
       </div>
-      <Button
-        color={window.innerWidth > 959 ? "transparent" : "white"}
-        justIcon={window.innerWidth > 959}
-        simple={!(window.innerWidth > 959)}
-        aria-label="Dashboard"
-        className={classes.buttonLink}
-      >
-        <Dashboard className={classes.icons} />
-        <Hidden mdUp implementation="css">
-          <p className={classes.linkText}>Dashboard</p>
-        </Hidden>
-      </Button>
       <div className={classes.manager}>
         <Button
           color={window.innerWidth > 959 ? "transparent" : "white"}
@@ -133,31 +125,25 @@ export default function AdminNavbarLinks() {
                       onClick={handleCloseNotification}
                       className={classes.dropdownItem}
                     >
-                      Mike John responded to your email
+                      SBA Boilerplate 60% completed.
                     </MenuItem>
                     <MenuItem
                       onClick={handleCloseNotification}
                       className={classes.dropdownItem}
                     >
-                      You have 5 new tasks
+                      Bank of Denver - Signature Required
                     </MenuItem>
                     <MenuItem
                       onClick={handleCloseNotification}
                       className={classes.dropdownItem}
                     >
-                      You{"'"}re now friend with Andrew
+                      *New data from Lexis/Nexis to review.
                     </MenuItem>
                     <MenuItem
                       onClick={handleCloseNotification}
                       className={classes.dropdownItem}
                     >
-                      Another Notification
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Another One
+                      7(a)ware Security Bulliten
                     </MenuItem>
                   </MenuList>
                 </ClickAwayListener>
@@ -206,18 +192,12 @@ export default function AdminNavbarLinks() {
                   <MenuList role="menu">
                     <LinkContainer to="/admin/user">
                       <MenuItem
-                        onClick={handleCloseProfile}
+                        onClick={handleProfile}
                         className={classes.dropdownItem}
                       >
                         Profile
                       </MenuItem>
                     </LinkContainer>
-                    <MenuItem
-                      onClick={handleCloseProfile}
-                      className={classes.dropdownItem}
-                    >
-                      Settings
-                    </MenuItem>
                     <Divider light />
                     <MenuItem
                       onClick={handleLogout}

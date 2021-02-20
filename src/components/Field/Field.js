@@ -31,5 +31,5 @@ Field.propTypes = {
   description: PropTypes.string,
   value: PropTypes.string,
   disabled: PropTypes.bool,
-  md: PropTypes.string
+  md: PropTypes.number
 };
