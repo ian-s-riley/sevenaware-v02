@@ -51,7 +51,17 @@ import CardFooter from "components/Card/CardFooter.js";
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 const useStyles = makeStyles(styles);
 
-const initialFormState = { name: '', code: '', order: 0, description: '', parentFormId:  '-1', parentForm: '' }
+const initialFormState = { 
+                          name: '', 
+                          code: '', 
+                          order: 0, 
+                          description: '', 
+                          helpCategory: '',
+                          helpTitle: '',
+                          helpDescription: '',
+                          legal: '',
+                          parentFormId:  '-1', 
+                          parentForm: '' }
 
 export default function Forms() {
   const classes = useStyles()
@@ -102,7 +112,8 @@ export default function Forms() {
   }  
 
   async function updateForm() {
-    if (!form.name || !form.code) return;        
+    if (!form.name || !form.code) return;     
+    console.log(form)   
     await API.graphql({ 
                         query: updateFormMutation, 
                         variables: { input: {
@@ -111,6 +122,10 @@ export default function Forms() {
                           name: form.name, 
                           order: form.order, 
                           description: form.description,
+                          helpCategory: form.helpCategory,
+                          helpTitle: form.helpTitle,
+                          helpDescription: form.helpDescription,
+                          legal: form.legal,
                           parentFormId: form.parentFormId,
                           parentForm: form.parentForm,
                         }} 
@@ -208,13 +223,16 @@ export default function Forms() {
   )
 
   const formDetail = (
+    <>
     <Card>
       <CardHeader color="primary">
         <h4 className={classes.cardTitleWhite}>Form ID: {form.id}</h4>
       </CardHeader>
       <CardBody>
       <GridContainer>
-          <GridItem xs={12} sm={12} md={6}>
+          
+          
+          <GridItem xs={12} sm={12} md={8}>
             <CustomInput
               labelText="Form Name"
               id="name"
@@ -228,10 +246,8 @@ export default function Forms() {
               }}                           
             />
           </GridItem>
-          
-          <GridItem xs={12} sm={12} md={6}
-                       
-          >
+
+          <GridItem xs={12} sm={12} md={4}>
           <CustomInput
               labelText="Parent Form"
               id="parentFormId"
@@ -303,6 +319,7 @@ export default function Forms() {
                 )}
               </Poppers>
           </GridItem>
+
           <GridItem xs={12} sm={12} md={6}>
           <CustomInput
               labelText="Code"
@@ -316,7 +333,7 @@ export default function Forms() {
               }}
             />
           </GridItem>
-          <GridItem xs={12} sm={12} md={6}>
+          <GridItem xs={12} sm={12} md={2}>
             <CustomInput
               labelText="Order"
               id="order"
@@ -330,25 +347,108 @@ export default function Forms() {
               }}                           
             />
           </GridItem>
-        </GridContainer>                   
-        <GridContainer>
-        <GridItem xs={12} sm={12} md={6}>
-          <CustomInput
-              labelText="Description"
-              id="description"
+
+          
+
+
+        </GridContainer>
+        
+           
+      </CardBody>
+      
+    </Card>
+
+    <Card>
+      <CardBody>
+
+      <GridContainer>          
+          
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+                labelText="Description"
+                id="description"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  defaultValue: form.description,
+                  multiline: true,
+                  rows: 4
+                }}
+              />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Help category"
+              id="helpCategory"
+              name="helpCategory"
               formControlProps={{
                 fullWidth: true
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                defaultValue: form.description,
-                multiline: true,
-                rows: 5
-              }}
+                defaultValue: form.helpCategory,                
+              }}                           
             />
           </GridItem>
-        </GridContainer>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+                labelText="Legal"
+                id="legal"
+                name="legal"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  defaultValue: form.legal,
+                  multiline: true,
+                  rows: 4
+                }}
+              />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Help title"
+              id="helpTitle"
+              name="helpTitle"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                defaultValue: form.helpTitle,                
+              }}                           
+            />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+                labelText="Help Description"
+                id="helpDescription"
+                name="helpDescription"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  defaultValue: form.helpDescription,
+                  multiline: true,
+                  rows: 4
+                }}
+              />
+          </GridItem>
+          
+        </GridContainer> 
+
       </CardBody>
+      </Card>
+
+      <Card>
       <CardFooter>
         <Button onClick={handleCancel}>Cancel</Button>        
         {
@@ -366,7 +466,8 @@ export default function Forms() {
         }
         <Button color="danger" onClick={() => deleteForm(form)}>Delete</Button>
       </CardFooter>
-    </Card>
+      </Card>
+      </>
   )
   
   return (

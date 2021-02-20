@@ -175,10 +175,10 @@ export default function FormTemplate() {
               </a>
             </CardAvatar>
             <CardBody profile>
-              <h6 className={classes.cardCategory}>form.helpCategory</h6>
-              <h4 className={classes.cardTitle}>form.helpTitle</h4>
+              <h6 className={classes.cardCategory}>{form.helpCategory}</h6>
+              <h4 className={classes.cardTitle}>{form.helpTitle}</h4>
               <p className={classes.description}>
-                form.helpDescription
+                {form.helpDescription}
               </p>
               <Button color="success" round>
                 more...
@@ -188,7 +188,7 @@ export default function FormTemplate() {
         </GridItem>
       </GridContainer>
       <FixedHelp
-          legal='form.legal'
+          legal={form.legal}
           handleFixedClick={handleFixedClick}
           fixedClasses={fixedClasses}
         />

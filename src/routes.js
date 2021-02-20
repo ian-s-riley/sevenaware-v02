@@ -71,14 +71,6 @@ const dashboardRoutes = [
     component: UserProfile,
     layout: "/admin"
   },
-  {
-    path: "/maps",
-    name: "Maps",
-    rtlName: "خرائط",
-    icon: LocationOn,
-    component: Maps,
-    layout: "/admin"
-  }
 ];
 
 export default dashboardRoutes;
