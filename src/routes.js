@@ -32,13 +32,13 @@ import Forms from 'views/Forms/Forms'
 import Fields from 'views/Fields/Fields'
 import Maps from "views/Maps/Maps.js";
 
-const dashboardRoutes = [
+const dashboardRoutes = [  
   {
-    path: "/dashboard",
-    name: "Dashboard",
-    rtlName: "لوحة القيادة",
-    icon: Dashboard,
-    component: DashboardPage,
+    path: "/formtemplate",
+    name: "Form Template",
+    rtlName: "ملف تعريفي للمستخدم",
+    icon: TableChart,
+    component: FormTemplate,
     layout: "/admin"
   },
   {
@@ -54,21 +54,21 @@ const dashboardRoutes = [
     icon: TableChart,
     component: Fields,
     layout: "/admin"
-  },
-  {
-    path: "/formtemplate",
-    name: "Form Template",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: TableChart,
-    component: FormTemplate,
-    layout: "/admin"
-  },
+  },  
   {
     path: "/user",
     name: "User Profile",
     rtlName: "ملف تعريفي للمستخدم",
     icon: Person,
     component: UserProfile,
+    layout: "/admin"
+  },
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    rtlName: "لوحة القيادة",
+    icon: Dashboard,
+    component: DashboardPage,
     layout: "/admin"
   },
 ];
