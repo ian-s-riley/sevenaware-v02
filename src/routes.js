@@ -18,11 +18,7 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
-import LibraryBooks from "@material-ui/icons/LibraryBooks";
-import BubbleChart from "@material-ui/icons/BubbleChart";
 import LocationOn from "@material-ui/icons/LocationOn";
-import Notifications from "@material-ui/icons/Notifications";
-import Unarchive from "@material-ui/icons/Unarchive";
 import TableChart from "@material-ui/icons/TableChart";
 // core components/views for Admin layout
 import DashboardPage from "views/Dashboard/Dashboard.js";
@@ -34,12 +30,21 @@ import Maps from "views/Maps/Maps.js";
 
 const dashboardRoutes = [  
   {
+    path: "/dashboard",
+    name: "Dashboard",
+    rtlName: "لوحة القيادة",
+    icon: Dashboard,
+    component: DashboardPage,
+    layout: "/admin"
+  },
+  {
     path: "/formtemplate",
     name: "Form Template",
     rtlName: "ملف تعريفي للمستخدم",
     icon: TableChart,
     component: FormTemplate,
-    layout: "/admin"
+    layout: "/admin",
+    invisible: true,
   },
   {
     path: "/forms",
@@ -62,14 +67,14 @@ const dashboardRoutes = [
     icon: Person,
     component: UserProfile,
     layout: "/admin"
-  },
+  },  
   {
-    path: "/dashboard",
-    name: "Dashboard",
-    rtlName: "لوحة القيادة",
-    icon: Dashboard,
-    component: DashboardPage,
-    layout: "/admin"
+    path: "/maps",
+    name: "Maps",
+    icon: LocationOn,
+    component: Maps,
+    layout: "/admin",
+    invisible: true,
   },
 ];
 

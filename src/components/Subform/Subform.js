@@ -8,6 +8,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
+import Button from "components/CustomButtons/Button.js";
 // @material-ui/icons
 import Input from "@material-ui/icons/Input";
 // core components
@@ -23,6 +24,14 @@ export default function Subform(props) {
         <TableRow className={classes.tableRow}>
             <TableCell className={tableCellClasses}>{props.name}</TableCell>
             <TableCell className={tableCellClasses}>{props.description}</TableCell>
+            <TableCell className={tableCellClasses}>
+            <Button 
+                onClick={() => {props.editSubform}}
+                color="success"
+            >
+            Save
+            </Button>
+            </TableCell>
         </TableRow>
     );
 }
@@ -31,4 +40,5 @@ Subform.propTypes = {
   name: PropTypes.string,
   id: PropTypes.string,
   description: PropTypes.string,
+  editSubform: PropTypes.func
 };

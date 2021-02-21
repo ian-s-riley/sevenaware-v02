@@ -1,7 +1,7 @@
 import React from "react";
 import {LinkContainer} from 'react-router-bootstrap'
 import classNames from "classnames";
-import { Hub, Auth } from "aws-amplify";
+import { Auth } from "aws-amplify";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -15,7 +15,6 @@ import Divider from "@material-ui/core/Divider";
 // @material-ui/icons
 import Person from "@material-ui/icons/Person";
 import Notifications from "@material-ui/icons/Notifications";
-import Dashboard from "@material-ui/icons/Dashboard";
 import Search from "@material-ui/icons/Search";
 // core components
 import CustomInput from "components/CustomInput/CustomInput.js";

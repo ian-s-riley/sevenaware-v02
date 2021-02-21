@@ -1,11 +1,10 @@
 /*eslint-disable*/
 import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import classnames from "classnames";
+import classNames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
-import { listForms, getForm } from '../../graphql/queries';
 import { createForm as createFormMutation, deleteForm as deleteFormMutation, updateForm as updateFormMutation } from '../../graphql/mutations';
 
 // nodejs library to set properties for components
@@ -23,9 +22,6 @@ import Paper from "@material-ui/core/Paper";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import Hidden from "@material-ui/core/Hidden";
 import Poppers from "@material-ui/core/Popper";
-import Subform from 'components/Subform/Subform'
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
 
 // @material-ui/icons
 import Store from "@material-ui/icons/Store";
@@ -51,10 +47,9 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import FormDetail from 'components/'
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
-import { TableRow, TableCell, TableFooter } from '@material-ui/core';
-
 const useStyles = makeStyles(styles);
 
 const initialFormState = { 
@@ -69,16 +64,14 @@ const initialFormState = {
                           parentFormId:  '-1', 
                           parentForm: '' }
 
-export default function Forms() {
+export default function FormDetail(props) {
   const history = useHistory();
-  const classes = useStyles();
-  const tableCellClasses = classnames(classes.tableCell);
+  const classes = useStyles()
 
+  const [open, setOpen] = useState(null);
   const [display, setDisplay] = useState('list')
   const [forms, setForms] = useState([])
   const [form, setForm] = useState(initialFormState)
-  const [subforms, setSubforms] = useState([])
-  const [parentFormId, setParentFormId] = useState('-1')
 
   useEffect(() => {
     // Specify how to clean up after this effect:
@@ -91,50 +84,18 @@ export default function Forms() {
     };
   });
 
-  useEffect(() => {
-    fetchForms();
-  }, []);
-
-  useEffect(() => {
-    fetchSubforms();
-  }, [parentFormId]);
-
-  async function fetchForms() {
-    const apiData = await API.graphql({ query: listForms, variables: { filter: {parentFormId: {eq: '-1'}} } });
-    const formsFromAPI = apiData.data.listForms.items;
-    setForms(formsFromAPI);    
-  }
-
-  async function fetchSubforms() {
-    const apiData = await API.graphql({ query: listForms, variables: { filter: {parentFormId: {eq: parentFormId}} } });
-    const formsFromAPI = apiData.data.listForms.items;    
-    setSubforms(formsFromAPI)
-  }
-
   async function createForm() {
     if (!form.name || !form.code) return
-    console.log(form)
     const formFromAPI = await API.graphql({ query: createFormMutation, variables: { input: form } })
     const newForm = formFromAPI.data.createForm
-    form.parentFormId === '-1' && setForms([...forms, newForm])
+    setForms([...forms, newForm])
     setForm(initialFormState);
     setDisplay('list')
   }
-  
-  async function selectForm({ id }) {
-    const formFromAPI = await API.graphql({ query: getForm, variables: { id  }});       
-    const thisForm = formFromAPI.data.getForm    
-    setForm(thisForm)
-    setParentFormId(thisForm.id)
-    setDisplay('edit')    
-  }  
-
-  async function selectSubform(subFormId) {
-    console.log(subFormId)
-  }  
 
   async function updateForm() {
-    if (!form.name || !form.code) return;       
+    if (!form.name || !form.code) return;     
+    console.log(form)   
     await API.graphql({ 
                         query: updateFormMutation, 
                         variables: { input: {
@@ -179,76 +140,34 @@ export default function Forms() {
       setDisplay('list')    
   }  
 
-  function handleCreateSubform() {
-    //setForm(initialFormState)  
-    setForm({ ...initialFormState, parentFormId: parentFormId, parentForm: 'name'}) 
 
-    setParentFormId(form.id)  
-    setSubforms([])
-    setDisplay('create') 
-    //console.log('form',form)   
-}  
+  const handleToggle = event => {
+    if (open && open.contains(event.target)) {
+      setOpen(null);
+    } else {
+      setOpen(event.currentTarget);
+    }
+  };
 
-  async function previewForm({ id, name }) {
-    //console.log('name', name)      
-    history.push("/admin/formtemplate", { id: id, from: name })
+  const handleClose = () => {
+    setOpen(null);
+  };
+
+  function handleSelectParentForm(value, name) {
+    setForm({ ...form, parentFormId: value, parentForm: name})  
   }
-
-  const formList = (
-    <Card>
-      <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>7(a)ware Form List</h4>
-      </CardHeader>
-      <CardBody>
-    
-    <GridContainer>
-        {
-        forms.map(form => (
-            <GridItem xs={12} sm={6} md={4} key={form.id}>
-                <Card>
-                    <CardHeader color="warning" stats icon>
-                    <CardIcon color="warning">
-                        <Icon>content_copy</Icon>
-                    </CardIcon>
-                    <p className={classes.cardCategory}>{form.code}</p>
-                    <h3 className={classes.cardTitle}>
-                        {form.name}
-                    </h3>
-                    </CardHeader>
-                    <CardBody>
-                        <Button color="success" onClick={() => selectForm(form)}>Edit Form</Button>
-                        <Button color="info" onClick={() => previewForm(form)}>Preview</Button>
-                    </CardBody>
-                    <CardFooter stats>
-                      <div className={classes.stats}>
-                        Form: {form.id}
-                        <br />
-                      </div>
-                    </CardFooter>
-                </Card>
-            </GridItem>
-        ))
-        }        
-      </GridContainer>
-      </CardBody>
-      <CardFooter>
-        <Button 
-          onClick={() => setDisplay('create')}
-          color="primary"
-        >New Form</Button>
-      </CardFooter>
-      </Card>
-  )
-
-  const formDetail = (
+  
+  return (
     <>
     <Card>
       <CardHeader color="primary">
         <h4 className={classes.cardTitleWhite}>Form ID: {form.id}</h4>
       </CardHeader>
       <CardBody>
-      <GridContainer>                    
-          <GridItem xs={12} sm={12} md={5}>
+      <GridContainer>
+          
+          
+          <GridItem xs={12} sm={12} md={8}>
             <CustomInput
               labelText="Form Name"
               id="name"
@@ -258,11 +177,85 @@ export default function Forms() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                value: form.name,                
+                defaultValue: form.name,                
               }}                           
             />
-          </GridItem>          
-          <GridItem xs={12} sm={12} md={5}>
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={4}>
+          <CustomInput
+              labelText="Parent Form"
+              id="parentFormId"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                value: form.parentForm,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <ArrowDropDown 
+                      onClick={handleToggle}
+                      aria-owns={open ? "menu-list-grow" : null}
+                      aria-haspopup="true" 
+                    >
+                      <Hidden mdUp implementation="css">
+                        <p onClick={handleClose} className={classes.linkText}>
+                          Parent Forms
+                        </p>
+                      </Hidden>
+                    </ArrowDropDown>
+                    <Clear onClick={() => handleSelectParentForm(null, '')} />                    
+                  </InputAdornment>
+                ),
+                disabled: false
+              }}              
+            >                                
+            </CustomInput>
+            <Poppers
+                open={Boolean(open)}
+                anchorEl={open}
+                transition
+                disablePortal
+                className={
+                  classNames({ [classes.popperClose]: !open }) +
+                  " " +
+                  classes.popperNav
+                }
+              >
+                {({ TransitionProps, placement }) => (
+                  <Grow
+                    {...TransitionProps}
+                    id="menu-list-grow"
+                    style={{
+                      transformOrigin:
+                        placement === "bottom" ? "center top" : "center bottom"
+                    }}
+                  >
+                    <Paper>
+                      <ClickAwayListener onClickAway={handleClose}>
+                        <MenuList role="menu">
+                        {
+
+                        forms.filter(parentForm => parentForm.id !== form.id).map(parentForm => (
+                          <MenuItem
+                            key={parentForm.id}
+                            onClick={() => handleSelectParentForm(parentForm.id, parentForm.name)}
+                            className={classes.dropdownItem}
+                          >
+                            {parentForm.name}
+                          </MenuItem>
+                        ))
+                        }  
+                                                  
+                        </MenuList>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                )}
+              </Poppers>
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
           <CustomInput
               labelText="Code"
               id="code"
@@ -271,7 +264,7 @@ export default function Forms() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                value: form.code,                
+                defaultValue: form.code,                
               }}
             />
           </GridItem>
@@ -285,12 +278,27 @@ export default function Forms() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                value: form.order,                
+                defaultValue: form.order,                
               }}                           
             />
           </GridItem>
 
-          <GridItem xs={12} sm={12} md={12}>
+          
+
+
+        </GridContainer>
+        
+           
+      </CardBody>
+      
+    </Card>
+
+    <Card>
+      <CardBody>
+
+      <GridContainer>          
+          
+          <GridItem xs={12} sm={12} md={6}>
             <CustomInput
                 labelText="Description"
                 id="description"
@@ -299,20 +307,13 @@ export default function Forms() {
                 }}
                 inputProps={{
                   onChange: (event) => handleChange(event),
-                  value: form.description,
+                  defaultValue: form.description,
                   multiline: true,
                   rows: 4
                 }}
               />
           </GridItem>
-        </GridContainer>                   
-      </CardBody>      
-    </Card>
 
-    <Card>
-      <CardBody>
-
-      <GridContainer>          
           <GridItem xs={12} sm={12} md={6}>
             <CustomInput
               labelText="Help category"
@@ -323,9 +324,26 @@ export default function Forms() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                value: form.helpCategory,                
+                defaultValue: form.helpCategory,                
               }}                           
             />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+                labelText="Legal"
+                id="legal"
+                name="legal"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  defaultValue: form.legal,
+                  multiline: true,
+                  rows: 4
+                }}
+              />
           </GridItem>
 
           <GridItem xs={12} sm={12} md={6}>
@@ -338,12 +356,12 @@ export default function Forms() {
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                value: form.helpTitle,                
+                defaultValue: form.helpTitle,                
               }}                           
             />
           </GridItem>
 
-          <GridItem xs={12} sm={12} md={12}>
+          <GridItem xs={12} sm={12} md={6}>
             <CustomInput
                 labelText="Help Description"
                 id="helpDescription"
@@ -353,84 +371,18 @@ export default function Forms() {
                 }}
                 inputProps={{
                   onChange: (event) => handleChange(event),
-                  value: form.helpDescription,
+                  defaultValue: form.helpDescription,
                   multiline: true,
                   rows: 4
                 }}
               />
           </GridItem>
+          
+        </GridContainer> 
 
-          <GridItem xs={12} sm={12} md={12}>
-            <CustomInput
-                labelText="Legal"
-                id="legal"
-                name="legal"
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  onChange: (event) => handleChange(event),
-                  value: form.legal,
-                  multiline: true,
-                  rows: 4
-                }}
-              />
-          </GridItem>                             
-        </GridContainer>         
       </CardBody>
       </Card>
-      {(display === 'edit') && (
-      <Card>
-        <CardBody>
-        <GridContainer>
-          <GridItem xs={12} sm={12} md={12}>
-                <Card>
-                    <CardHeader color="warning">
-                    <h4 className={classes.cardTitleWhite}>Subforms</h4>                    
-                    </CardHeader>
-                    <CardBody>
-                    <Table className={classes.table}>
-                      <TableBody>
-                      {
-                        subforms.map(subform => (
-                          <TableRow className={classes.tableRow} key={subform.id}>
-                          <TableCell className={tableCellClasses}>
-                            <Button 
-                                onClick={() => selectSubform(subform.id)}
-                                color="success"
-                            >
-                            Edit
-                            </Button>
-                            </TableCell>
-                            <TableCell className={tableCellClasses}>{subform.name}</TableCell>
-                            <TableCell className={tableCellClasses}>{subform.description}</TableCell>                            
-                        </TableRow>
-                        ))
-                      }
-                      </TableBody>
-                      <TableFooter>
-                      <TableRow className={classes.tableRow}>
-                          <TableCell className={tableCellClasses}>
-                            <Button 
-                              onClick={handleCreateSubform}
-                              color="primary"
-                            >New Subform</Button>
-                            </TableCell>
-                            <TableCell className={tableCellClasses}></TableCell>
-                            <TableCell className={tableCellClasses}></TableCell>                            
-                        </TableRow>
-                      </TableFooter>
-                    </Table>                      
-                    </CardBody>
-                    <CardFooter>
-                    
-                    </CardFooter>
-                </Card>
-            </GridItem>
-        </GridContainer>
-        </CardBody>
-      </Card>
-      )}
+
       <Card>
       <CardFooter>
         <Button onClick={handleCancel}>Cancel</Button>        
@@ -439,23 +391,22 @@ export default function Forms() {
         <Button 
           onClick={createForm}
           color="success"
-        >Save New Form</Button>
+        >Create New Form</Button>
         ) : (
-          <>
           <Button 
             onClick={updateForm}
             color="success"
           >Save</Button>
-          <Button color="danger" onClick={() => deleteForm(form)}>Delete</Button>
-          </>
         )
-        }                
+        }
+        <Button color="danger" onClick={() => deleteForm(form)}>Delete</Button>
       </CardFooter>
       </Card>
       </>
   )
-  
-  return (
-    display === 'list' ? formList : formDetail
-  );
 }
+
+FormDetail.propTypes = {
+    form: PropTypes.object,
+    subforms: PropTypes.object,
+};

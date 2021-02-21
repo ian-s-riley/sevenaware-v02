@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import classNames from "classnames";
+import { useHistory } from "react-router-dom";
 
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
@@ -24,8 +24,6 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import avatar from "assets/img/help/form-help-icon-01.png";
 
-import { TableCell, TableRow } from '@material-ui/core';
-
 const styles = {
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -49,21 +47,16 @@ const useStyles = makeStyles(styles);
 const initialFormState = { name: '' }
 
 export default function FormTemplate() {
+    const history = useHistory();    
     const classes = useStyles();
  
-    const [id, setId] = useState('eb614f56-dc15-4d08-a76f-26e11e584518');
+    const formId = history.location.state.id
     const [fixedClasses, setFixedClasses] = useState("dropdown");
 
     const [form, setForm] = useState(initialFormState)
     const [fields, setFields] = useState([])
     const [subforms, setSubforms] = useState([])
-    const [formStack, setformStack] = useState([id])
-
-    // Create a new array based on current state:
-    // let newStack = [...formStack];
-    // newStack.push({ value: id });
-    // setformStack(newStack);
-    // console.log(newStack)
+    const [nextSubform, setNextSubform] = useState('')
 
     useEffect(() => {
       fetchForm();
@@ -72,9 +65,8 @@ export default function FormTemplate() {
     }, []);
   
     async function fetchForm() {
-      //console.log('thisFormId', thisFormId)
-      //console.log('formStack', formStack)
-      const formFromAPI = await API.graphql({ query: getForm, variables: { id  }});            
+      console.log('formId', formId)
+      const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});            
       const thisForm = formFromAPI.data.getForm    
       setForm(thisForm)
     }
@@ -83,15 +75,16 @@ export default function FormTemplate() {
       //const apiData = await API.graphql({ query: listFields, filter: {formId: {eq: "eb614f56-dc15-4d08-a76f-26e11e584518"}} });
       const apiData = await API.graphql({ query: listFields });
       const fieldsFromAPI = apiData.data.listFields.items;
-      const formFields = fieldsFromAPI.filter(filteredFields => filteredFields.formId === id);
+      const formFields = fieldsFromAPI.filter(filteredFields => filteredFields.formId === formId);
       setFields(formFields);    
     }
 
     async function fetchSubforms() {
       const apiData = await API.graphql({ query: listForms });
       const formsFromAPI = apiData.data.listForms.items;
-      const formSubforms = formsFromAPI.filter(filteredForms => filteredForms.parentFormId === id);
-      setSubforms(formSubforms);    
+      const formSubforms = formsFromAPI.filter(filteredForms => filteredForms.parentFormId === formId);
+      setSubforms(formSubforms) 
+      formSubforms.length > 0 && setNextSubform(formSubforms[0].id)
     }
 
     const handleFixedClick = () => {
@@ -103,8 +96,18 @@ export default function FormTemplate() {
     }; 
     
     const handleNextClick = () => {
-      setId('7eddfb11-b2f7-44a6-b127-b535690bd421')
-    }; 
+      //go to the next subform that hasn't been completed yet     
+      console.log('nextSubform', nextSubform)      
+      if (nextSubform) {
+        history.push("/admin/formtemplate", { id: nextSubform.id, from: nextSubform.name })
+      } else {
+        history.push("/admin/forms")
+      }
+    };
+    
+    const handleBackClick = () => {
+      history.goBack()
+    };
 
 
   return (
@@ -134,7 +137,7 @@ export default function FormTemplate() {
               </GridContainer>        
             </CardBody>
             <CardFooter>
-              <Button color="info">Back</Button>
+              <Button color="info" onClick={handleBackClick}>Back</Button>
               <Button color="success" onClick={handleNextClick}>Next</Button>
             </CardFooter>
           </Card>

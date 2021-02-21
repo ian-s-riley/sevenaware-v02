@@ -22,8 +22,8 @@ let ps;
 
 const switchRoutes = (
   <Switch>
-    {routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
+    {routes.map((prop, key) => {      
+      if (prop.layout === "/admin") {        
         return (
           <Route
             path={prop.layout + prop.path}
@@ -46,8 +46,6 @@ function Admin({ ...rest }) {
   // ref to help us initialize PerfectScrollbar on windows devices
   const mainPanel = React.createRef();
   // states and functions
-  const [image, setImage] = React.useState(bgImage);
-  const [color, setColor] = React.useState("blue");
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   
@@ -86,10 +84,10 @@ function Admin({ ...rest }) {
         routes={routes}
         logoText={"7(a)ware"}
         logo={logo}
-        image={image}
+        image={bgImage}
         handleDrawerToggle={handleDrawerToggle}
         open={mobileOpen}
-        color={color}
+        color={"blue"}
         {...rest}
       />
       <div className={classes.mainPanel} ref={mainPanel}>
