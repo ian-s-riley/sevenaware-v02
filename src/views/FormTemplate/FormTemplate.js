@@ -50,7 +50,7 @@ export default function FormTemplate() {
     const history = useHistory();    
     const classes = useStyles();
  
-    const formId = history.location.state.id
+    const formId = history.location.state.formId
     const [fixedClasses, setFixedClasses] = useState("dropdown");
 
     const [form, setForm] = useState(initialFormState)

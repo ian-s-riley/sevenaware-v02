@@ -25,6 +25,7 @@ import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
 import FormTemplate from "views/FormTemplate/FormTemplate.js";
 import Forms from 'views/Forms/Forms'
+import FormDetail from 'views/FormDetail/FormDetail'
 import Fields from 'views/Fields/Fields'
 import Maps from "views/Maps/Maps.js";
 
@@ -40,9 +41,14 @@ const dashboardRoutes = [
   {
     path: "/formtemplate",
     name: "Form Template",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: TableChart,
     component: FormTemplate,
+    layout: "/admin",
+    invisible: true,
+  },
+  {
+    path: "/formdetail",
+    name: "Form Detail",
+    component: FormDetail,
     layout: "/admin",
     invisible: true,
   },

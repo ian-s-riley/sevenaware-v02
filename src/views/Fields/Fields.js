@@ -228,7 +228,7 @@ export default function Fields() {
           <TableCell className={tableCellClasses}>
             <Button 
                 onClick={() => selectField(field)}
-                color="success"
+                color="primary"
             >
             Edit
             </Button>
