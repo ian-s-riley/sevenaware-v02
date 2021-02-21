@@ -129,9 +129,9 @@ export default function Forms() {
     setDisplay('edit')    
   }  
 
-  async function selectSubform(subFormId) {
-    console.log(subFormId)
-  }  
+  // async function selectSubform(subFormId) {
+  //   console.log(subFormId)
+  // }  
 
   async function updateForm() {
     if (!form.name || !form.code) return;       
@@ -396,7 +396,7 @@ export default function Forms() {
                           <TableRow className={classes.tableRow} key={subform.id}>
                           <TableCell className={tableCellClasses}>
                             <Button 
-                                onClick={() => selectSubform(subform.id)}
+                                onClick={() => selectForm(subform)}
                                 color="success"
                             >
                             Edit
