@@ -1,6 +1,7 @@
 /*eslint-disable*/
 import React, { useState, useEffect } from 'react';
 import classNames from "classnames";
+import tableClassNames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
@@ -47,6 +48,10 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 const useStyles = makeStyles(styles);
@@ -71,6 +76,8 @@ const initialFieldState = {
 
 export default function Fields() {
   const classes = useStyles()
+  const tableClasses = useStyles();
+  const tableCellClasses = tableClassNames(tableClasses.tableCell);
 
   const [open, setOpen] = useState(null);
   const [display, setDisplay] = useState('list')
@@ -206,33 +213,27 @@ export default function Fields() {
       <CardBody>
     
     <GridContainer>
+      <Table className={classes.table}>
+        <TableBody>
         {
         fields.map(field => (
-            <GridItem xs={12} sm={6} md={3} key={field.id}>
-                <Card>
-                    <CardHeader color="info" stats icon onClick={() => selectField(field)}>
-                    <CardIcon color="info">
-                        <Icon>content_copy</Icon>
-                    </CardIcon>
-                    <p className={classes.cardCategory}>{field.code}</p>
-                    <h3 className={classes.cardTitle}>
-                        {field.name}
-                    </h3>
-                    </CardHeader>
-                    <CardBody>
-                        {field.description}
-                    </CardBody>
-                    <CardFooter stats>
-                      <div className={classes.stats}>
-                        Field: {field.id}
-                        <br />
-                        Parent Form: {field.form}
-                      </div>
-                    </CardFooter>
-                </Card>
-            </GridItem>
-        ))
-        }        
+          <TableRow className={classes.tableRow} key={field.id}>
+          <TableCell className={tableCellClasses}>
+            <Button 
+                onClick={() => selectField(field)}
+                color="success"
+            >
+            Edit
+            </Button>
+            </TableCell>
+            <TableCell className={tableCellClasses}>{field.name}</TableCell>
+            <TableCell className={tableCellClasses}>{field.code}</TableCell>
+            <TableCell className={tableCellClasses}>{field.parentFormId}</TableCell>                            
+        </TableRow>
+        ))            
+        }   
+        </TableBody>
+        </Table>     
       </GridContainer>
       </CardBody>
       <CardFooter>

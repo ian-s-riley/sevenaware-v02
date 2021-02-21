@@ -402,6 +402,14 @@ export default function Forms() {
                             Edit
                             </Button>
                             </TableCell>
+                            <TableCell className={tableCellClasses}>
+                            <Button 
+                                onClick={() => previewForm(subform)}
+                                color="info"
+                            >
+                            Edit
+                            </Button>
+                            </TableCell>
                             <TableCell className={tableCellClasses}>{subform.name}</TableCell>
                             <TableCell className={tableCellClasses}>{subform.description}</TableCell>                            
                         </TableRow>
