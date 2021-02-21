@@ -19,6 +19,7 @@ type Field @model @auth(rules: [{allow: public}]) {
   description: String
   fieldType: String
   order: Int
+  size: Int
   value: String
   defaultValue: String
   options: String

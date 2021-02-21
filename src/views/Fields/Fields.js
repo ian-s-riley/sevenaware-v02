@@ -49,6 +49,7 @@ import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
@@ -215,6 +216,12 @@ export default function Fields() {
     <GridContainer>
       <Table className={classes.table}>
         <TableBody>
+        <TableRow>
+            <TableCell className={tableCellClasses}></TableCell>
+            <TableCell className={tableCellClasses}>Field Name</TableCell>
+            <TableCell className={tableCellClasses}>Field Code</TableCell>
+            <TableCell className={tableCellClasses}>Parent Form ID</TableCell> 
+        </TableRow>
         {
         fields.map(field => (
           <TableRow className={classes.tableRow} key={field.id}>
@@ -228,7 +235,7 @@ export default function Fields() {
             </TableCell>
             <TableCell className={tableCellClasses}>{field.name}</TableCell>
             <TableCell className={tableCellClasses}>{field.code}</TableCell>
-            <TableCell className={tableCellClasses}>{field.parentFormId}</TableCell>                            
+            <TableCell className={tableCellClasses}>{field.formId}</TableCell>                            
         </TableRow>
         ))            
         }   
@@ -251,107 +258,40 @@ export default function Fields() {
         <h4 className={classes.cardTitleWhite}>Field ID: {field.id}</h4>
       </CardHeader>
       <CardBody>
+      
       <GridContainer>
-          <GridItem xs={12} sm={12} md={6}>
-            <CustomInput
-              labelText="Field Name"
-              id="name"
-              name="name"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                defaultValue: field.name,                
-              }}                           
-            />
-          </GridItem>
-          
-          <GridItem xs={12} sm={12} md={6}>
-          <CustomInput
-              labelText="Parent Form"
-              id="formId"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                value: field.form,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <ArrowDropDown 
-                      onClick={handleToggle}
-                      aria-owns={open ? "menu-list-grow" : null}
-                      aria-haspopup="true" 
-                    >
-                      <Hidden mdUp implementation="css">
-                        <p onClick={handleClose} className={classes.linkText}>
-                          Parent Forms
-                        </p>
-                      </Hidden>
-                    </ArrowDropDown>
-                    <Clear onClick={() => handleSelectForm(null, '')} />                    
-                  </InputAdornment>
-                ),
-                disabled: false
-              }}              
-            >                                
-            </CustomInput>
-            <Poppers
-                open={Boolean(open)}
-                anchorEl={open}
-                transition
-                disablePortal
-                className={
-                  classNames({ [classes.popperClose]: !open }) +
-                  " " +
-                  classes.popperNav
-                }
-              >
-                {({ TransitionProps, placement }) => (
-                  <Grow
-                    {...TransitionProps}
-                    id="menu-list-grow"
-                    style={{
-                      transformOrigin:
-                        placement === "bottom" ? "center top" : "center bottom"
-                    }}
-                  >
-                    <Paper>
-                      <ClickAwayListener onClickAway={handleClose}>
-                        <MenuList role="menu">
-                        {
+        <GridItem xs={12} sm={12} md={8}>
+          <GridContainer>
+            <GridItem xs={12} sm={12} md={6}>
+              <CustomInput
+                labelText="Field Name"
+                id="name"
+                name="name"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  defaultValue: field.name,                
+                }}                           
+              />
+            </GridItem>
 
-                        forms.map(form => (
-                          <MenuItem
-                            key={form.id}
-                            onClick={() => handleSelectForm(form.id, form.name)}
-                            className={classes.dropdownItem}
-                          >
-                            {form.name}
-                          </MenuItem>
-                        ))
-                        }                                                    
-                        </MenuList>
-                      </ClickAwayListener>
-                    </Paper>
-                  </Grow>
-                )}
-              </Poppers>
-          </GridItem>
-          <GridItem xs={12} sm={12} md={6}>
-          <CustomInput
-              labelText="Code"
-              id="code"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                defaultValue: field.code,                
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12} sm={12} md={6}>
+            <GridItem xs={12} sm={12} md={4}>
+            <CustomInput
+                labelText="Code"
+                id="code"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  defaultValue: field.code,                
+                }}
+              />
+            </GridItem>
+
+            <GridItem xs={12} sm={12} md={2}>
             <CustomInput
               labelText="Order"
               id="order"
@@ -365,9 +305,148 @@ export default function Fields() {
               }}                           
             />
           </GridItem>
-        </GridContainer>                   
+
+            <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Label"
+              id="label"
+              name="label"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                defaultValue: field.label,                
+              }}                           
+            />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Default Value"
+              id="defaultValue"
+              name="defaultValue"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                defaultValue: field.defaultValue,                
+              }}                           
+            />
+          </GridItem>
+
+            <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Field Type"
+              id="fieldType"
+              name="fieldType"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                defaultValue: field.fieldType,                
+              }}                           
+            />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Options"
+              id="options"
+              name="options"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                defaultValue: field.options,                
+              }}                           
+            />
+          </GridItem>
+
+          </GridContainer>
+        </GridItem>
+        <GridItem xs={12} sm={12} md={4}>
+          <GridContainer>
+            <GridItem>
+            <CustomInput
+                labelText="Parent Form"
+                id="formId"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  value: field.form,                
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <ArrowDropDown 
+                        onClick={handleToggle}
+                        aria-owns={open ? "menu-list-grow" : null}
+                        aria-haspopup="true" 
+                      >
+                        <Hidden mdUp implementation="css">
+                          <p onClick={handleClose} className={classes.linkText}>
+                            Parent Forms
+                          </p>
+                        </Hidden>
+                      </ArrowDropDown>
+                      <Clear onClick={() => handleSelectForm(null, '')} />                    
+                    </InputAdornment>
+                  ),
+                  disabled: false
+                }}              
+              >                                
+              </CustomInput>
+              <Poppers
+                  open={Boolean(open)}
+                  anchorEl={open}
+                  transition
+                  disablePortal
+                  className={
+                    classNames({ [classes.popperClose]: !open }) +
+                    " " +
+                    classes.popperNav
+                  }
+                >
+                  {({ TransitionProps, placement }) => (
+                    <Grow
+                      {...TransitionProps}
+                      id="menu-list-grow"
+                      style={{
+                        transformOrigin:
+                          placement === "bottom" ? "center top" : "center bottom"
+                      }}
+                    >
+                      <Paper>
+                        <ClickAwayListener onClickAway={handleClose}>
+                          <MenuList role="menu">
+                          {
+
+                          forms.map(form => (
+                            <MenuItem
+                              key={form.id}
+                              onClick={() => handleSelectForm(form.id, form.name)}
+                              className={classes.dropdownItem}
+                            >
+                              {form.name}
+                            </MenuItem>
+                          ))
+                          }                                                    
+                          </MenuList>
+                        </ClickAwayListener>
+                      </Paper>
+                    </Grow>
+                  )}
+                </Poppers>
+            </GridItem>
+          </GridContainer>
+        </GridItem>
+      </GridContainer>
+                
         <GridContainer>
-        <GridItem xs={12} sm={12} md={6}>
+        <GridItem xs={12} sm={12} md={12}>
           <CustomInput
               labelText="Description"
               id="description"
