@@ -83,7 +83,10 @@ export default function FormDetail() {
   }  
 
   async function fetchSubforms() {
-    const formsFromAPI = await API.graphql({ query: listForms, variables: { filter: {parentFormId: {eq: formId}} } }); 
+    const formsFromAPI = await API.graphql({ 
+      query: listForms, 
+      variables: { filter: {parentFormId: {eq: formId}} }
+    }); 
     setSubforms(formsFromAPI.data.listForms.items)
   }
 
@@ -348,7 +351,7 @@ export default function FormDetail() {
                                 Preview
                                 </Button>
                             </TableCell>
-                            <TableCell className={tableCellClasses}>{subform.name}</TableCell>
+                            <TableCell className={tableCellClasses}>{subform.order} {subform.name}</TableCell>
                             <TableCell className={tableCellClasses}>{subform.description}</TableCell>                            
                         </TableRow>
                         ))

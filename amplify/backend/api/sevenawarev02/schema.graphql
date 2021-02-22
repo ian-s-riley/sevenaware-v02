@@ -1,14 +1,21 @@
-type Form @model @auth(rules: [{allow: public}]) {
+type Form @model 
+          @auth(rules: [{allow: public}]) 
+          @key(
+            name: "ByOrder"
+            fields: ["order", "name"]
+            queryField: "formsByOrder"
+          )
+  {
   id: ID!
   name: String!
   code: String
-  order: Int
+  order: Int!
   description: String
   helpCategory: String
   helpTitle: String
   helpDescription: String
   legal: String
-  parentFormId: String
+  parentFormId: String!
   parentForm: String
 }
 
@@ -30,4 +37,3 @@ type Field @model @auth(rules: [{allow: public}]) {
   formId: String
   form: String
 }
- 

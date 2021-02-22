@@ -267,7 +267,7 @@ export default function FieldDetail() {
                 onChange: (event) => handleChange(event),
                 value: field.description,
                 multiline: true,
-                rows: 5
+                rows: 3
               }}
             />
           </GridItem>

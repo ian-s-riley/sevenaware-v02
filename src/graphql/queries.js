@@ -101,3 +101,39 @@ export const listFields = /* GraphQL */ `
     }
   }
 `;
+export const formsByOrder = /* GraphQL */ `
+  query FormsByOrder(
+    $order: Int
+    $name: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelFormFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    formsByOrder(
+      order: $order
+      name: $name
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        code
+        order
+        description
+        helpCategory
+        helpTitle
+        helpDescription
+        legal
+        parentFormId
+        parentForm
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;

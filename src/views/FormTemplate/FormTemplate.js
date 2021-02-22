@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
+import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
@@ -19,9 +20,10 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import FixedHelp from "components/FixedHelp/FixedHelp";
 import Field from 'components/Field/Field'
-import Subform from 'components/Subform/Subform'
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 import avatar from "assets/img/help/form-help-icon-01.png";
 
 const styles = {
@@ -47,35 +49,34 @@ const useStyles = makeStyles(styles);
 const initialFormState = { name: '' }
 
 export default function FormTemplate() {
-    const history = useHistory();    
+    const history = useHistory();
     const classes = useStyles();
+    const tableCellClasses = classnames(classes.tableCell);
  
     const formId = history.location.state.formId
+    console.log('default function: formId', formId)
     const [fixedClasses, setFixedClasses] = useState("dropdown");
 
     const [form, setForm] = useState(initialFormState)
     const [fields, setFields] = useState([])
     const [subforms, setSubforms] = useState([])
-    const [nextSubform, setNextSubform] = useState('')
 
     useEffect(() => {
       fetchForm();
       fetchFields();
       fetchSubforms();
-    }, []);
+    }, [formId]);
   
     async function fetchForm() {
       console.log('formId', formId)
       const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});            
-      const thisForm = formFromAPI.data.getForm    
-      setForm(thisForm)
+      setForm(formFromAPI.data.getForm )
     }
 
     async function fetchFields() {
       //const apiData = await API.graphql({ query: listFields, filter: {formId: {eq: "eb614f56-dc15-4d08-a76f-26e11e584518"}} });
-      const apiData = await API.graphql({ query: listFields });
-      const fieldsFromAPI = apiData.data.listFields.items;
-      const formFields = fieldsFromAPI.filter(filteredFields => filteredFields.formId === formId);
+      const fieldsFromAPI = await API.graphql({ query: listFields });
+      const formFields = fieldsFromAPI.data.listFields.items.filter(filteredFields => filteredFields.formId === formId);
       setFields(formFields);    
     }
 
@@ -84,7 +85,6 @@ export default function FormTemplate() {
       const formsFromAPI = apiData.data.listForms.items;
       const formSubforms = formsFromAPI.filter(filteredForms => filteredForms.parentFormId === formId);
       setSubforms(formSubforms) 
-      formSubforms.length > 0 && setNextSubform(formSubforms[0].id)
     }
 
     const handleFixedClick = () => {
@@ -93,21 +93,17 @@ export default function FormTemplate() {
     } else {
          setFixedClasses("dropdown");
     }
-    }; 
-    
-    const handleNextClick = () => {
-      //go to the next subform that hasn't been completed yet     
-      console.log('nextSubform', nextSubform)      
-      if (nextSubform) {
-        history.push("/admin/formtemplate", { id: nextSubform.id, from: nextSubform.name })
-      } else {
-        history.push("/admin/forms")
-      }
-    };
-    
-    const handleBackClick = () => {
+    };     
+
+    function handleNextClick() {    
+      const nextSubform = subforms[0]
+      //console.log('handleNextClick: nextSubformId', nextSubformId)  
+      nextSubform ? history.push("/admin/formtemplate", { formId: nextSubform.id }) : history.goBack()
+    }
+
+    function handleBackClick() {    
       history.goBack()
-    };
+    }    
 
 
   return (
@@ -147,7 +143,7 @@ export default function FormTemplate() {
                     <CardHeader color="warning">
                     <h4 className={classes.cardTitleWhite}>Subforms</h4>
                     <p className={classes.cardCategoryWhite}>
-                        We'll continue your appliction by getting even more information.
+                        We'll continue your appliction by getting more information.
                     </p>
                     </CardHeader>
                     <CardBody>
@@ -155,12 +151,12 @@ export default function FormTemplate() {
                       <TableBody>
                       {
                         subforms.map(subform => (
-                          <Subform
-                            id={subform.id}
-                            key={subform.id}
-                            name={subform.name}
-                            description={subform.description}
-                          />
+                          <TableRow className={classes.tableRow} key={subform.id}>
+                            <TableCell className={tableCellClasses}>{subform.name}</TableCell>
+                            <TableCell className={tableCellClasses}>{subform.description}</TableCell>
+                            <TableCell className={tableCellClasses}>
+                            </TableCell>
+                        </TableRow>
                         ))
                       }
                       </TableBody>
