@@ -55,7 +55,6 @@ export const getField = /* GraphQL */ `
       description
       fieldType
       order
-      size
       value
       defaultValue
       options
@@ -85,7 +84,6 @@ export const listFields = /* GraphQL */ `
         description
         fieldType
         order
-        size
         value
         defaultValue
         options

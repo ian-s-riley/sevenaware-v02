@@ -79,7 +79,6 @@ export const createField = /* GraphQL */ `
       description
       fieldType
       order
-      size
       value
       defaultValue
       options
@@ -107,7 +106,6 @@ export const updateField = /* GraphQL */ `
       description
       fieldType
       order
-      size
       value
       defaultValue
       options
@@ -135,7 +133,6 @@ export const deleteField = /* GraphQL */ `
       description
       fieldType
       order
-      size
       value
       defaultValue
       options

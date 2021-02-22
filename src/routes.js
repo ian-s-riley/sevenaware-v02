@@ -25,7 +25,8 @@ import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
 import FormTemplate from "views/FormTemplate/FormTemplate.js";
 import Forms from 'views/Forms/Forms'
-import FormDetail from 'views/FormDetail/FormDetail'
+import FormDetail from 'components/FormDetail/FormDetail'
+import FieldDetail from 'components/FieldDetail/FieldDetail'
 import Fields from 'views/Fields/Fields'
 import Maps from "views/Maps/Maps.js";
 
@@ -53,6 +54,13 @@ const dashboardRoutes = [
     invisible: true,
   },
   {
+    path: "/fielddetail",
+    name: "Field Detail",
+    component: FieldDetail,
+    layout: "/admin",
+    invisible: true,
+  },
+  {
     path: "/forms",
     name: "Forms",
     icon: TableChart,
@@ -64,7 +72,8 @@ const dashboardRoutes = [
     name: "Fields",
     icon: TableChart,
     component: Fields,
-    layout: "/admin"
+    layout: "/admin",
+    invisible: true
   },  
   {
     path: "/user",

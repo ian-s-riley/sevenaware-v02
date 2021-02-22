@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
-import { listForms, getForm, listFields } from '../../graphql/queries';
+import { listForms } from '../../graphql/queries';
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";

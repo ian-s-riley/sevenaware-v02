@@ -8,38 +8,12 @@ import { API } from 'aws-amplify';
 import { listForms, getForm, listFields } from '../../graphql/queries';
 import { createForm as createFormMutation, deleteForm as deleteFormMutation, updateForm as updateFormMutation } from '../../graphql/mutations';
 
-// nodejs library to set properties for components
-import PropTypes from "prop-types";
-
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
-import Icon from "@material-ui/core/Icon";
-import Danger from "components/Typography/Danger.js";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import MenuItem from "@material-ui/core/MenuItem";
-import MenuList from "@material-ui/core/MenuList";
-import Grow from "@material-ui/core/Grow";
-import Paper from "@material-ui/core/Paper";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
-import Hidden from "@material-ui/core/Hidden";
-import Poppers from "@material-ui/core/Popper";
-import Subform from 'components/Subform/Subform'
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 
 // @material-ui/icons
-import Store from "@material-ui/icons/Store";
-import Warning from "@material-ui/icons/Warning";
-import Clear from "@material-ui/icons/Clear";
-import DateRange from "@material-ui/icons/DateRange";
-import LocalOffer from "@material-ui/icons/LocalOffer";
-import Update from "@material-ui/icons/Update";
-import Accessibility from "@material-ui/icons/Accessibility";
-import ArrowDropDown from "@material-ui/icons/ArrowDropDown";
-import Person from "@material-ui/icons/Person";
-import Notifications from "@material-ui/icons/Notifications";
-import Dashboard from "@material-ui/icons/Dashboard";
-import Search from "@material-ui/icons/Search";
 
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -48,13 +22,11 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
-import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { TableRow, TableCell, TableFooter } from '@material-ui/core';
-import { supportsHistory } from 'history/DOMUtils';
 
 const useStyles = makeStyles(styles);
 
@@ -77,8 +49,8 @@ export default function FormDetail() {
 
   const formId = history.location.state.formId
   const parentFormId = history.location.state.parentFormId
-  console.log('formId', formId)
-  console.log('parentFormID',parentFormId)
+  //onsole.log('formId', formId)
+  //console.log('parentFormID',parentFormId)
 
   const [form, setForm] = useState(initialFormState)
   const [subforms, setSubforms] = useState([])
@@ -103,33 +75,25 @@ export default function FormDetail() {
 
   async function fetchForm() {
       if (formId === '') {
-          setForm(initialFormState)
           setForm({ ...initialFormState, parentFormId: parentFormId})
       } else {
         const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});       
-        const thisForm = formFromAPI.data.getForm    
-        setForm(thisForm)      
+        setForm(formFromAPI.data.getForm )      
       }
   }  
 
   async function fetchSubforms() {
-    const apiData = await API.graphql({ query: listForms, variables: { filter: {parentFormId: {eq: formId}} } });
-    const formsFromAPI = apiData.data.listForms.items;    
-    setSubforms(formsFromAPI)
+    const formsFromAPI = await API.graphql({ query: listForms, variables: { filter: {parentFormId: {eq: formId}} } }); 
+    setSubforms(formsFromAPI.data.listForms.items)
   }
 
   async function fetchFields() {
-    const apiData = await API.graphql({ query: listFields, variables: { filter: {formId: {eq: formId}} } });
-    const fieldsFromAPI = apiData.data.listFields.items;
-    await Promise.all(fieldsFromAPI.map(async field => {
-      return field;
-    }))
-    setFields(apiData.data.listFields.items);    
+    const fieldsFromAPI = await API.graphql({ query: listFields, variables: { filter: {formId: {eq: formId}} } });
+    setFields(fieldsFromAPI.data.listFields.items);    
   }
 
   async function createForm() {
     if (!form.name || !form.code) return
-    console.log('createForm: form', form)
     await API.graphql({ query: createFormMutation, variables: { input: form } })
     history.goBack()  
   }
@@ -179,7 +143,15 @@ export default function FormDetail() {
 
   function handleCreateSubform() {
     history.push("/admin/formdetail", { formId: '', parentFormId: formId }) 
-}  
+  }  
+
+  async function handleSelectField({ id }) { 
+    history.push("/admin/fielddetail", { fieldId: id, formId: formId }) 
+  }  
+
+  function handleCreateField() {
+    history.push("/admin/fielddetail", { fieldId: '', formId: formId }) 
+  }  
 
   async function previewForm({ id, name }) {
     //console.log('name', name)      
@@ -360,21 +332,21 @@ export default function FormDetail() {
                       {
                         subforms.map(subform => (
                           <TableRow className={classes.tableRow} key={subform.id}>
-                          <TableCell className={tableCellClasses}>
-                            <Button 
-                                onClick={() => handleSelectSubform(subform)}
-                                color="success"
-                            >
-                            Edit
-                            </Button>
+                            <TableCell className={tableCellClasses}>
+                                <Button 
+                                    onClick={() => handleSelectSubform(subform)}
+                                    color="success"
+                                >
+                                Edit
+                                </Button>
                             </TableCell>
                             <TableCell className={tableCellClasses}>
-                            <Button 
-                                onClick={() => previewForm(subform)}
-                                color="info"
-                            >
-                            Preview
-                            </Button>
+                                <Button 
+                                    onClick={() => previewForm(subform)}
+                                    color="info"
+                                >
+                                Preview
+                                </Button>
                             </TableCell>
                             <TableCell className={tableCellClasses}>{subform.name}</TableCell>
                             <TableCell className={tableCellClasses}>{subform.description}</TableCell>                            
@@ -383,22 +355,17 @@ export default function FormDetail() {
                       }
                       </TableBody>
                       <TableFooter>
-                      <TableRow className={classes.tableRow}>
-                          <TableCell className={tableCellClasses}>
+                        <TableRow className={classes.tableRow}>
+                          <TableCell className={tableCellClasses} colSpan={4}>
                             <Button 
                               onClick={handleCreateSubform}
                               color="primary"
                             >New Subform</Button>
-                            </TableCell>
-                            <TableCell className={tableCellClasses}></TableCell>
-                            <TableCell className={tableCellClasses}></TableCell>                            
+                            </TableCell>                            
                         </TableRow>
                       </TableFooter>
                     </Table>                      
                     </CardBody>
-                    <CardFooter>
-                    
-                    </CardFooter>
                 </Card>
             </GridItem>
         </GridContainer>
@@ -418,6 +385,14 @@ export default function FormDetail() {
                       {
                         fields.map(field => (
                           <TableRow className={classes.tableRow} key={field.id}>                            
+                            <TableCell className={tableCellClasses}>
+                                <Button 
+                                    onClick={() => handleSelectField(field)}
+                                    color="success"
+                                >
+                                Edit
+                                </Button>
+                            </TableCell>
                             <TableCell className={tableCellClasses}>{field.name}</TableCell>
                             <TableCell className={tableCellClasses}>{field.fieldType}</TableCell>                            
                             <TableCell className={tableCellClasses}>{field.id}</TableCell>                            
@@ -425,6 +400,16 @@ export default function FormDetail() {
                         ))
                       }
                       </TableBody>
+                      <TableFooter>
+                      <TableRow className={classes.tableRow}>
+                          <TableCell className={tableCellClasses} colSpan={4}>
+                            <Button 
+                              onClick={handleCreateField}
+                              color="warning"
+                            >New Field</Button>
+                            </TableCell>                           
+                        </TableRow>
+                      </TableFooter>
                     </Table>                      
                     </CardBody>
                 </Card>
