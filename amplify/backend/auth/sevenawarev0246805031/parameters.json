@@ -1,8 +1,8 @@
 {
-    "identityPoolName": "sevenawarev0275b70936_identitypool_75b70936",
+    "identityPoolName": "sevenawarev0246805031_identitypool_46805031",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "sevena75b70936",
-    "userPoolName": "sevenawarev0275b70936_userpool_75b70936",
+    "resourceNameTruncated": "sevena46805031",
+    "userPoolName": "sevenawarev0246805031_userpool_46805031",
     "autoVerifiedAttributes": [
         "email"
     ],
@@ -28,10 +28,10 @@
     "userpoolClientReadAttributes": [
         "email"
     ],
-    "userpoolClientLambdaRole": "sevena75b70936_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "sevena46805031_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "75b70936",
-    "resourceName": "sevenawarev0275b70936",
+    "sharedId": "46805031",
+    "resourceName": "sevenawarev0246805031",
     "authSelections": "identityPoolAndUserPool",
     "authRoleArn": {
         "Fn::GetAtt": [

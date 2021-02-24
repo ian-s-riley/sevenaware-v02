@@ -6,14 +6,19 @@ import classnames from "classnames";
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
 import { listForms, getForm, listFields } from '../../graphql/queries';
-import { createForm as createFormMutation, deleteForm as deleteFormMutation, updateForm as updateFormMutation } from '../../graphql/mutations';
+import { createForm as createFormMutation, deleteForm as deleteFormMutation, updateForm as updateFormMutation, deleteField as deleteFieldMutation } from '../../graphql/mutations';
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
+import { TableHead, TableRow, TableCell, TableFooter } from '@material-ui/core';
 
 // @material-ui/icons
+import Add from "@material-ui/icons/AddCircle";
+import Check from "@material-ui/icons/CheckCircle";
+import Cancel from "@material-ui/icons/Cancel";
+import Find from "@material-ui/icons/FindInPageRounded";
 
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -22,12 +27,11 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
+import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
-import { TableRow, TableCell, TableFooter } from '@material-ui/core';
-
 const useStyles = makeStyles(styles);
 
 const initialFormState = { 
@@ -46,6 +50,7 @@ export default function FormDetail() {
   const history = useHistory();
   const classes = useStyles();
   const tableCellClasses = classnames(classes.tableCell);
+  const tableHeadClasses = classnames(classes.tableHead);
 
   const formId = history.location.state.formId
   const parentFormId = history.location.state.parentFormId
@@ -123,11 +128,20 @@ export default function FormDetail() {
     history.goBack()
   }
 
-  async function deleteForm({ id }) {
+  async function handleDeleteForm({ id }) {
     var result = confirm("Are you sure you want to delete this form?");
     if (result) {      
       await API.graphql({ query: deleteFormMutation, variables: { input: { id } }});
       history.goBack()
+    }        
+  }
+
+  async function handleDeleteSubform({ id }) {
+    var result = confirm("Are you sure you want to delete this subform?");
+    if (result) {      
+      await API.graphql({ query: deleteFormMutation, variables: { input: { id } }});
+      const newSubformsArray = subforms.filter(subform => subform.id !== id)
+      setSubforms(newSubformsArray)
     }        
   }
 
@@ -156,7 +170,17 @@ export default function FormDetail() {
     history.push("/admin/fielddetail", { fieldId: '', formId: formId }) 
   }  
 
-  async function previewForm({ id, name }) {
+  async function handleDeleteField({ id }) {
+    var result = confirm("Are you sure you want to delete this field?");
+    if (result) {      
+      await API.graphql({ query: deleteFieldMutation, variables: { input: { id } }})
+      const newFieldsArray = fields.filter(field => field.id !== id)
+      setFields(newFieldsArray)
+      
+    }        
+  }
+
+  async function handlePreviewForm({ id, name }) {
     //console.log('name', name)      
     history.push("/admin/formtemplate", { formId: id })
   }
@@ -313,7 +337,8 @@ export default function FormDetail() {
             onClick={updateForm}
             color="success"
           >Save</Button>
-          <Button color="danger" onClick={() => deleteForm(form)}>Delete</Button>
+          <Button color="info" onClick={() => handlePreviewForm(form)}>Preview</Button>
+          <Button color="danger" onClick={() => handleDeleteForm(form)}>Delete</Button>
           </>
         )
         }                
@@ -326,47 +351,69 @@ export default function FormDetail() {
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
                 <Card>
-                    <CardHeader color="warning">
-                    <h4 className={classes.cardTitleWhite}>Subforms</h4>                    
-                    </CardHeader>
+                <CardHeader color="warning" stats icon>
+                  <CardIcon color="warning">
+                    <h4 className={classes.cardTitleWhite}>Subforms</h4>
+                  </CardIcon>
+                  
+                  
+                </CardHeader>
                     <CardBody>
                     <Table className={classes.table}>
+                    <TableHead>
+                        <TableCell className={tableHeadClasses}>
+                        <Button
+                          onClick={handleCreateSubform}
+                          justIcon
+                          small
+                          color="success"
+                          className={classes.marginRight}
+                        >
+                          <Add className={classes.icons} />
+                        </Button>
+                        </TableCell>
+                        <TableCell className={tableHeadClasses}>Subform </TableCell>
+                        <TableCell className={tableHeadClasses}>Description</TableCell>
+                      </TableHead>
                       <TableBody>
                       {
                         subforms.map(subform => (
                           <TableRow className={classes.tableRow} key={subform.id}>
                             <TableCell className={tableCellClasses}>
-                                <Button 
-                                    onClick={() => handleSelectSubform(subform)}
-                                    color="success"
+                                <>
+                                <Button
+                                  onClick={() => handleSelectSubform(subform)}
+                                  justIcon
+                                  color="success"
+                                  className={classes.marginRight}
                                 >
-                                Edit
+                                  <Check className={classes.icons} />
                                 </Button>
-                            </TableCell>
-                            <TableCell className={tableCellClasses}>
-                                <Button 
-                                    onClick={() => previewForm(subform)}
-                                    color="info"
+                                <Button
+                                  onClick={() => handlePreviewForm(subform)}
+                                  justIcon
+                                  color="info"
+                                  className={classes.marginRight}
                                 >
-                                Preview
+                                  <Find className={classes.icons} />
                                 </Button>
+                                <Button
+                                  onClick={() => handleDeleteSubform(subform)}
+                                  justIcon
+                                  color="danger"
+                                  className={classes.marginRight}
+                                >
+                                  <Cancel className={classes.icons} />
+                                </Button>
+                                </>
                             </TableCell>
                             <TableCell className={tableCellClasses}>{subform.order} {subform.name}</TableCell>
-                            <TableCell className={tableCellClasses}>{subform.description}</TableCell>                            
+                            <TableCell className={tableCellClasses}>{subform.description}</TableCell>                                                           
                         </TableRow>
                         ))
                       }
                       </TableBody>
-                      <TableFooter>
-                        <TableRow className={classes.tableRow}>
-                          <TableCell className={tableCellClasses} colSpan={4}>
-                            <Button 
-                              onClick={handleCreateSubform}
-                              color="primary"
-                            >New Subform</Button>
-                            </TableCell>                            
-                        </TableRow>
-                      </TableFooter>
+
                     </Table>                      
                     </CardBody>
                 </Card>
@@ -379,40 +426,67 @@ export default function FormDetail() {
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
                 <Card>
-                    <CardHeader color="info">
-                    <h4 className={classes.cardTitleWhite}>Fields</h4>                    
-                    </CardHeader>
+                <CardHeader color="info" icon>
+                      <GridContainer>
+                        <GridItem  xs={12} sm={6} md={6}>
+                          <CardIcon color="info">
+                            <h4 className={classes.cardTitleWhite}>Fields</h4>
+                          </CardIcon>
+                        </GridItem>
+                        <GridItem  xs={12} sm={6} md={6}>
+                        
+                        </GridItem>
+                      </GridContainer>
+                  
+                  
+                  
+                </CardHeader> 
+                    
                     <CardBody>
                     <Table className={classes.table}>
+                      <TableHead>
+                        <TableCell className={tableHeadClasses}>
+                        <Button
+                            onClick={handleCreateField}
+                            justIcon
+                            color="success"
+                          >
+                            <Add className={classes.icons} />
+                        </Button>
+                        </TableCell>
+                        <TableCell className={tableHeadClasses}>Field Name</TableCell>
+                        <TableCell className={tableHeadClasses}>Field Type</TableCell>
+                        <TableCell className={tableHeadClasses}>Field ID</TableCell>
+                      </TableHead>
                       <TableBody>
                       {
                         fields.map(field => (
                           <TableRow className={classes.tableRow} key={field.id}>                            
                             <TableCell className={tableCellClasses}>
-                                <Button 
-                                    onClick={() => handleSelectField(field)}
-                                    color="success"
+                              <Button
+                                onClick={() => handleSelectField(field)}
+                                justIcon
+                                color="success"
+                                className={classes.marginRight}
+                              >
+                                <Check className={classes.icons} />
+                              </Button>          
+                              <Button
+                                  onClick={() => handleDeleteField(field)}
+                                  justIcon
+                                  color="danger"
+                                  className={classes.marginRight}
                                 >
-                                Edit
-                                </Button>
+                                  <Cancel className={classes.icons} />
+                                </Button>                                                                                      
                             </TableCell>
                             <TableCell className={tableCellClasses}>{field.name}</TableCell>
                             <TableCell className={tableCellClasses}>{field.fieldType}</TableCell>                            
-                            <TableCell className={tableCellClasses}>{field.id}</TableCell>                            
+                            <TableCell className={tableCellClasses}>{field.id}</TableCell>                          
                         </TableRow>
                         ))
                       }
                       </TableBody>
-                      <TableFooter>
-                      <TableRow className={classes.tableRow}>
-                          <TableCell className={tableCellClasses} colSpan={4}>
-                            <Button 
-                              onClick={handleCreateField}
-                              color="warning"
-                            >New Field</Button>
-                            </TableCell>                           
-                        </TableRow>
-                      </TableFooter>
                     </Table>                      
                     </CardBody>
                 </Card>

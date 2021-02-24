@@ -1,6 +1,6 @@
 {
   "auth": {
-    "sevenawarev0275b70936": {
+    "sevenawarev0246805031": {
       "service": "Cognito",
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
@@ -17,7 +17,7 @@
             "authenticationType": "API_KEY",
             "apiKeyConfig": {
               "apiKeyExpirationDays": 30,
-              "description": "sevenawarev02-apikey"
+              "description": "sevenaware-apikey"
             }
           },
           "additionalAuthenticationProviders": []

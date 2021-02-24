@@ -1,6 +1,6 @@
 projects:
   sevenawarev02:
-    schemaPath: amplify/backend/api/sevenawarev02/build/schema.graphql
+    schemaPath: src/graphql/schema.json
     includes:
       - src/graphql/**/*.js
     excludes:
@@ -10,9 +10,3 @@ projects:
         codeGenTarget: javascript
         generatedFileName: ''
         docsFilePath: src/graphql
-        region: us-east-1
-        apiId: null
-        maxDepth: 2
-extensions:
-  amplify:
-    version: 3

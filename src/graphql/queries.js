@@ -15,6 +15,7 @@ export const getForm = /* GraphQL */ `
       legal
       parentFormId
       parentForm
+      isArray
       createdAt
       updatedAt
     }
@@ -39,6 +40,7 @@ export const listForms = /* GraphQL */ `
         legal
         parentFormId
         parentForm
+        isArray
         createdAt
         updatedAt
       }
@@ -101,22 +103,20 @@ export const listFields = /* GraphQL */ `
     }
   }
 `;
-export const formsByOrder = /* GraphQL */ `
-  query FormsByOrder(
-    $order: Int
-    $name: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelFormFilterInput
+export const searchForms = /* GraphQL */ `
+  query SearchForms(
+    $filter: SearchableFormFilterInput
+    $sort: SearchableFormSortInput
     $limit: Int
     $nextToken: String
+    $from: Int
   ) {
-    formsByOrder(
-      order: $order
-      name: $name
-      sortDirection: $sortDirection
+    searchForms(
       filter: $filter
+      sort: $sort
       limit: $limit
       nextToken: $nextToken
+      from: $from
     ) {
       items {
         id
@@ -130,10 +130,12 @@ export const formsByOrder = /* GraphQL */ `
         legal
         parentFormId
         parentForm
+        isArray
         createdAt
         updatedAt
       }
       nextToken
+      total
     }
   }
 `;

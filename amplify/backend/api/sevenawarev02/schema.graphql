@@ -1,10 +1,6 @@
 type Form @model 
           @auth(rules: [{allow: public}]) 
-          @key(
-            name: "ByOrder"
-            fields: ["order", "name"]
-            queryField: "formsByOrder"
-          )
+          @searchable
   {
   id: ID!
   name: String!
@@ -17,23 +13,26 @@ type Form @model
   legal: String
   parentFormId: String!
   parentForm: String
+  isArray: String
 }
 
-type Field @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  name: String!
-  code: String
-  description: String
-  fieldType: String
-  order: Int
-  value: String
-  defaultValue: String
-  options: String
-  userId: String
-  lenderId: String
-  label: String
-  helpText: String
-  image: String
-  formId: String
-  form: String
-}
+type Field 	@model 
+	@auth(rules: [{allow: public}])		
+	{
+	  id: ID!
+	  name: String!
+	  code: String
+	  description: String
+	  fieldType: String
+	  order: Int
+	  value: String
+	  defaultValue: String
+	  options: String
+	  userId: String
+	  lenderId: String
+	  label: String
+	  helpText: String
+	  image: String
+	  formId: String!
+	  form: String
+	}
