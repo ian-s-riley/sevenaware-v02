@@ -16,6 +16,7 @@ export const getForm = /* GraphQL */ `
       parentFormId
       parentForm
       isArray
+      isComplete
       createdAt
       updatedAt
     }
@@ -41,6 +42,7 @@ export const listForms = /* GraphQL */ `
         parentFormId
         parentForm
         isArray
+        isComplete
         createdAt
         updatedAt
       }
@@ -131,6 +133,7 @@ export const searchForms = /* GraphQL */ `
         parentFormId
         parentForm
         isArray
+        isComplete
         createdAt
         updatedAt
       }

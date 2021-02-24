@@ -3,11 +3,17 @@ import { useHistory } from "react-router-dom";
 import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
-import { API } from 'aws-amplify';
-import { listFields, getForm, listForms } from '../../graphql/queries';
+import { API, graphqlOperation } from 'aws-amplify';
+import { searchFields, getForm, searchForms } from '../../graphql/queries';
+import { updateForm as updateFormMutation } from '../../graphql/mutations';
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import Checkbox from "@material-ui/core/Checkbox";
 
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -20,10 +26,13 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import FixedHelp from "components/FixedHelp/FixedHelp";
 import Field from 'components/Field/Field'
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
+
+// @material-ui/icons
+import Edit from "@material-ui/icons/Edit";
+import Close from "@material-ui/icons/Close";
+import Check from "@material-ui/icons/Check";
+
+
 import avatar from "assets/img/help/form-help-icon-01.png";
 
 const styles = {
@@ -54,7 +63,6 @@ export default function FormTemplate() {
     const tableCellClasses = classnames(classes.tableCell);
  
     const formId = history.location.state.formId
-    console.log('default function: formId', formId)
     const [fixedClasses, setFixedClasses] = useState("dropdown");
 
     const [form, setForm] = useState(initialFormState)
@@ -68,23 +76,43 @@ export default function FormTemplate() {
     }, [formId]);
   
     async function fetchForm() {
-      console.log('formId', formId)
       const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});            
       setForm(formFromAPI.data.getForm )
     }
 
-    async function fetchFields() {
-      //const apiData = await API.graphql({ query: listFields, filter: {formId: {eq: "eb614f56-dc15-4d08-a76f-26e11e584518"}} });
-      const fieldsFromAPI = await API.graphql({ query: listFields });
-      const formFields = fieldsFromAPI.data.listFields.items.filter(filteredFields => filteredFields.formId === formId);
-      setFields(formFields);    
+    async function fetchFields() {  
+      const apiData = await API.graphql(graphqlOperation(searchFields, {
+        filter: { formId: { match: formId }},
+        sort: {
+          direction: 'asc',
+          field: 'order'
+        }
+      }));
+      const fieldsFromAPI = apiData.data.searchFields.items 
+      setFields(fieldsFromAPI);  
     }
 
     async function fetchSubforms() {
-      const apiData = await API.graphql({ query: listForms });
-      const formsFromAPI = apiData.data.listForms.items;
-      const formSubforms = formsFromAPI.filter(filteredForms => filteredForms.parentFormId === formId);
-      setSubforms(formSubforms) 
+      const apiData = await API.graphql(graphqlOperation(searchForms, {
+        filter: { parentFormId: { match: formId }},
+        sort: {
+          direction: 'asc',
+          field: 'order'
+        }
+      }));
+      const formsFromAPI = apiData.data.searchForms.items 
+      setSubforms(formsFromAPI);  
+    }
+
+    async function handleSaveForm() {      
+      await API.graphql({ 
+                          query: updateFormMutation, 
+                          variables: { input: {
+                            id: form.id, 
+                            isComplete: 'true',
+                          }} 
+                        });
+      handleNextClick()
     }
 
     const handleFixedClick = () => {
@@ -95,10 +123,51 @@ export default function FormTemplate() {
     }
     };     
 
-    function handleNextClick() {    
-      const nextSubform = subforms[0]
-      //console.log('handleNextClick: nextSubformId', nextSubformId)  
-      nextSubform ? history.push("/admin/formtemplate", { formId: nextSubform.id }) : history.goBack()
+    async function handleNextClick() {  
+      //get the forms & subforms
+      const apiData = await API.graphql(graphqlOperation(
+        searchForms, {
+          filter: {             
+            or: [
+              { parentFormId: { match: formId } },
+              { parentFormId: { match: form.parentFormId } }
+            ],
+            and: [
+              { isComplete: { eq: ''} }
+            ]
+          },
+          sort: {
+            direction: 'asc',
+            field: 'order'
+          }
+        }
+        ))       
+      const formsFromAPI =  apiData.data.searchForms.items      
+      console.log('handleNextClick: formsFromAPI', formsFromAPI)
+
+      //go to the next incomplete subform of this form, if there is one
+      const subFormsArray = formsFromAPI.filter(subform => subform.parentFormId === formId);
+      if (subFormsArray.length > 0) {
+        console.log('history.push', subFormsArray[0].id)
+        history.push("/admin/formtemplate", { formId: subFormsArray[0].id })
+      } else { 
+        //no sub forms, go to the next sibling form (unless we are a top level form)
+        if (form.parentFormId === '-1') {
+          console.log('history.push', 'admin/forms')
+          history.push("/admin/forms")
+        } else {
+          //go to the next incomplete subform of this form's parent form, if there is one
+          const siblingFormsArray = formsFromAPI.filter(siblingform => siblingform.parentFormId === form.parentFormId);
+          if (siblingFormsArray.length > 0) {
+            console.log('history.push', siblingFormsArray[0].id)
+            history.push("/admin/formtemplate", { formId: siblingFormsArray[0].id })
+          } else { 
+            //no incomplete sub or sibling forms, go to the parent form            
+            console.log('history.push', form.parentFormId)      
+            history.push("/admin/formtemplate", { formId: form.parentFormId })          
+          }
+        }                
+      }            
     }
 
     function handleBackClick() {    
@@ -134,7 +203,8 @@ export default function FormTemplate() {
             </CardBody>
             <CardFooter>
               <Button color="info" onClick={handleBackClick}>Back</Button>
-              <Button color="success" onClick={handleNextClick}>Next</Button>
+              <Button color="success" onClick={handleSaveForm}>Save</Button>
+              <Button color="info" onClick={handleNextClick}>Next</Button>
             </CardFooter>
           </Card>
           <GridContainer>
@@ -155,6 +225,15 @@ export default function FormTemplate() {
                             <TableCell className={tableCellClasses}>{subform.name}</TableCell>
                             <TableCell className={tableCellClasses}>{subform.description}</TableCell>
                             <TableCell className={tableCellClasses}>
+                              <Checkbox
+                                checked={subform.isComplete !== ''}
+                                checkedIcon={<Check className={classes.checkedIcon} />}
+                                icon={<Check className={classes.uncheckedIcon} />}
+                                classes={{
+                                  checked: classes.checked,
+                                  root: classes.root
+                                }}
+                              />
                             </TableCell>
                         </TableRow>
                         ))

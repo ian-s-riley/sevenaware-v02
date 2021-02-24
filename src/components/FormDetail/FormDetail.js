@@ -45,13 +45,13 @@ const initialFormState = {
                           legal: '',
                           parentFormId:  '-1', 
                           parentForm: '',
-                          isArray: '' }
+                          isArray: '',
+                          isComplete: '' }
 
 export default function FormDetail() {
   const history = useHistory();
   const classes = useStyles();
   const tableCellClasses = classnames(classes.tableCell);
-  const tableHeadClasses = classnames(classes.tableHead);
 
   const formId = history.location.state.formId
   const parentFormId = history.location.state.parentFormId
@@ -420,10 +420,10 @@ export default function FormDetail() {
                                   <Cancel className={classes.icons} />
                                 </Button>
                                 </>
-                            </TableCell>
-                            <TableCell className={tableCellClasses}>{subform.order}</TableCell>
+                            </TableCell>                            
                             <TableCell className={tableCellClasses}>{subform.name}</TableCell>
                             <TableCell className={tableCellClasses}>{subform.description}</TableCell>                                                           
+                            <TableCell className={tableCellClasses}>{subform.order}</TableCell>
                         </TableRow>
                         ))
                       }
@@ -467,7 +467,7 @@ export default function FormDetail() {
                           </TableCell>
                           <TableCell className={tableCellClasses}>Field Name</TableCell>
                           <TableCell className={tableCellClasses}>Field Type</TableCell>
-                          <TableCell className={tableCellClasses}>Field ID</TableCell>
+                          <TableCell className={tableCellClasses}>Order</TableCell>
                         </TableRow>
                       {
                         fields.map(field => (
@@ -492,7 +492,7 @@ export default function FormDetail() {
                             </TableCell>
                             <TableCell className={tableCellClasses}>{field.name}</TableCell>
                             <TableCell className={tableCellClasses}>{field.fieldType}</TableCell>                            
-                            <TableCell className={tableCellClasses}>{field.id}</TableCell>                          
+                            <TableCell className={tableCellClasses}>{field.order}</TableCell>                          
                         </TableRow>
                         ))
                       }

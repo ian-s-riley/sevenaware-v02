@@ -16,6 +16,7 @@ export const onCreateForm = /* GraphQL */ `
       parentFormId
       parentForm
       isArray
+      isComplete
       createdAt
       updatedAt
     }
@@ -36,6 +37,7 @@ export const onUpdateForm = /* GraphQL */ `
       parentFormId
       parentForm
       isArray
+      isComplete
       createdAt
       updatedAt
     }
@@ -56,6 +58,7 @@ export const onDeleteForm = /* GraphQL */ `
       parentFormId
       parentForm
       isArray
+      isComplete
       createdAt
       updatedAt
     }
