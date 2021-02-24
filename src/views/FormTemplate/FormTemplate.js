@@ -140,7 +140,7 @@ export default function FormTemplate() {
       //console.log('siblingFormsFromAPI', formsFromAPI)
     }
 
-    async function handleSaveForm(isComplete) {      
+    async function handlePublishForm(isComplete) {      
       await API.graphql({ 
                           query: updateFormMutation, 
                           variables: { input: {
@@ -148,7 +148,7 @@ export default function FormTemplate() {
                             isComplete: isComplete,
                           }} 
                         });
-      console.log('handleSaveForm')
+      console.log('handlePublishForm')
       handleNextClick()
     }
 
@@ -183,6 +183,10 @@ export default function FormTemplate() {
         history.push("/admin/formtemplate", { formId: form.parentFormId })
       }
     }    
+
+    async function handleSelectForm({ id }) { 
+      history.push("/admin/formtemplate", { formId: id })
+    }  
 
     const handleFixedClick = () => {
       if (fixedClasses === "dropdown") {
@@ -221,7 +225,7 @@ export default function FormTemplate() {
             </CardBody>
             <CardFooter>
               <Button color="info" onClick={handleBackClick}>Back</Button>
-              {form.isComplete ? (<Button onClick={() => handleSaveForm('')}>Un-Save</Button>) : (<Button color="success" onClick={() => handleSaveForm('true')}>Save</Button>)}
+              {form.isComplete ? (<Button onClick={() => handlePublishForm('')}>Unpublish</Button>) : (<Button color="success" onClick={() => handlePublishForm('true')}>Publish</Button>)}
               <Button color="info" onClick={handleNextClick}>Next</Button>
             </CardFooter>
           </Card>
@@ -254,7 +258,14 @@ export default function FormTemplate() {
                             <TableCell className={tableCellClasses}>{subform.name}</TableCell>
                             <TableCell className={tableCellClasses}>{subform.description}</TableCell>
                             <TableCell className={tableCellClasses}>
-                              
+                            <Button
+                                onClick={() => handleSelectForm(subform)}
+                                justIcon
+                                color="success"
+                                className={classes.marginRight}
+                              >
+                                <Edit className={classes.icons} />
+                              </Button>
                             </TableCell>
                         </TableRow>
                         ))

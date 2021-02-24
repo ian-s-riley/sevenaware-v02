@@ -68,7 +68,7 @@ export default function Forms() {
   }
 
   function handlePreviewForm({ id }) {    
-    history.push("/admin/formtemplate", { formId: id })
+    history.push("/admin/formtemplate", { formId: id, parentFormName: '' })
   }
   
   return (
