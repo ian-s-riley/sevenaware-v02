@@ -61,14 +61,14 @@ export default function Forms() {
   
   function handleSelectForm(id) { 
     history.push("/admin/formdetail", { formId: id, parentFormId: '-1' }) 
-  }  
-
-  function handlePreviewForm({ id, name }) {    
-    history.push("/admin/formtemplate", { formId: id })
-  }
+  }    
 
   function handleCreateForm() {    
     history.push("/admin/formDetail", { formId: '', parentFormId: '-1' })
+  }
+
+  function handlePreviewForm({ id }) {    
+    history.push("/admin/formtemplate", { formId: id })
   }
   
   return (

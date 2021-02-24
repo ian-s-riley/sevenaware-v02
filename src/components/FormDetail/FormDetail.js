@@ -194,7 +194,7 @@ export default function FormDetail() {
     }        
   }
 
-  async function handlePreviewForm({ id, name }) {
+  async function handlePreviewForm({ id }) {
     //console.log('name', name)      
     history.push("/admin/formtemplate", { formId: id })
   }

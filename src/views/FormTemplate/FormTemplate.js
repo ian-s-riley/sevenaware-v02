@@ -55,7 +55,7 @@ const styles = {
 };
 
 const useStyles = makeStyles(styles); 
-const initialFormState = { name: '' }
+const initialFormState = { name: '', parentFormId: '' }
 
 export default function FormTemplate() {
     const history = useHistory();
@@ -68,15 +68,24 @@ export default function FormTemplate() {
     const [form, setForm] = useState(initialFormState)
     const [fields, setFields] = useState([])
     const [subforms, setSubforms] = useState([])
+    const [incompleteSubforms, setIncompleteSubforms] = useState([])
+    const [siblingForms, setSiblingForms] = useState([])
+    const [nextFormId, setNextFormId] = useState('')
+    
 
     useEffect(() => {
       fetchForm();
       fetchFields();
-      fetchSubforms();
+      fetchSubforms()
     }, [formId]);
+
+    useEffect(() => {
+      fetchSiblingForms()
+    }, [form]);
   
     async function fetchForm() {
-      const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});            
+      const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});  
+      //console.log('formFromAPI', formFromAPI)          
       setForm(formFromAPI.data.getForm )
     }
 
@@ -100,39 +109,23 @@ export default function FormTemplate() {
           field: 'order'
         }
       }));
+      //show all subforms
       const formsFromAPI = apiData.data.searchForms.items 
-      setSubforms(formsFromAPI);  
+      setSubforms(formsFromAPI)
+
+      //get the incomplete subforms for navigation
+      const incompleteSubformFromAPI = formsFromAPI.filter(incompleteForm => incompleteForm.isComplete === '');
+      //console.log('incompleteSubformFromAPI', incompleteSubformFromAPI)
+      setIncompleteSubforms(incompleteSubformFromAPI)
     }
 
-    async function handleSaveForm() {      
-      await API.graphql({ 
-                          query: updateFormMutation, 
-                          variables: { input: {
-                            id: form.id, 
-                            isComplete: 'true',
-                          }} 
-                        });
-      handleNextClick()
-    }
-
-    const handleFixedClick = () => {
-    if (fixedClasses === "dropdown") {
-        setFixedClasses("dropdown show");
-    } else {
-         setFixedClasses("dropdown");
-    }
-    };     
-
-    async function handleNextClick() {  
-      //get the forms & subforms
+    async function fetchSiblingForms() {
       const apiData = await API.graphql(graphqlOperation(
         searchForms, {
           filter: {             
-            or: [
-              { parentFormId: { match: formId } },
-              { parentFormId: { match: form.parentFormId } }
-            ],
             and: [
+              { id: { ne: formId } },
+              { parentFormId: { match: form.parentFormId } },
               { isComplete: { eq: ''} }
             ]
           },
@@ -141,38 +134,63 @@ export default function FormTemplate() {
             field: 'order'
           }
         }
-        ))       
-      const formsFromAPI =  apiData.data.searchForms.items      
-      console.log('handleNextClick: formsFromAPI', formsFromAPI)
+        ))
+      const formsFromAPI = apiData.data.searchForms.items 
+      setSiblingForms(formsFromAPI)
+      //console.log('siblingFormsFromAPI', formsFromAPI)
+    }
 
-      //go to the next incomplete subform of this form, if there is one
-      const subFormsArray = formsFromAPI.filter(subform => subform.parentFormId === formId);
-      if (subFormsArray.length > 0) {
-        console.log('history.push', subFormsArray[0].id)
-        history.push("/admin/formtemplate", { formId: subFormsArray[0].id })
-      } else { 
-        //no sub forms, go to the next sibling form (unless we are a top level form)
+    async function handleSaveForm(isComplete) {      
+      await API.graphql({ 
+                          query: updateFormMutation, 
+                          variables: { input: {
+                            id: form.id, 
+                            isComplete: isComplete,
+                          }} 
+                        });
+      console.log('handleSaveForm')
+      handleNextClick()
+    }
+
+    function handleNextClick() {  
+      console.log('handleNextClick: incompleteSubforms', incompleteSubforms)   
+      console.log('handleNextClick: siblingForms', siblingForms)   
+      console.log('handleNextClick: parentFormId', form.parentFormId)   
+
+      if (incompleteSubforms.length > 0) {
+        //go to the next incomplete subform of this form, if there is one
+        console.log('handleNextClick: this form has subforms, first incomplete subform:', incompleteSubforms[0].id)
+        history.push("/admin/formtemplate", { formId: incompleteSubforms[0].id })
+      } else if (siblingForms.length > 0) {
         if (form.parentFormId === '-1') {
-          console.log('history.push', 'admin/forms')
+          console.log('handleNextClick: no incomplete subforms, this is a top level form:', form.parentFormId)
           history.push("/admin/forms")
         } else {
-          //go to the next incomplete subform of this form's parent form, if there is one
-          const siblingFormsArray = formsFromAPI.filter(siblingform => siblingform.parentFormId === form.parentFormId);
-          if (siblingFormsArray.length > 0) {
-            console.log('history.push', siblingFormsArray[0].id)
-            history.push("/admin/formtemplate", { formId: siblingFormsArray[0].id })
-          } else { 
-            //no incomplete sub or sibling forms, go to the parent form            
-            console.log('history.push', form.parentFormId)      
-            history.push("/admin/formtemplate", { formId: form.parentFormId })          
-          }
-        }                
-      }            
+          console.log('handleNextClick: no incomplete subforms, first incomplete sibling:', siblingForms[0].id)
+          history.push("/admin/formtemplate", { formId: siblingForms[0].id })
+        }
+      } else {
+        //no sub or sibling forms, go to the parent
+        console.log('handleNextClick: no subform or sibling - goto parent', form.parentFormId)
+        history.push("/admin/formtemplate", { formId: form.parentFormId })
+      }
     }
 
     function handleBackClick() {    
-      history.goBack()
+      if (form.parentFormId === '-1') {
+        history.push("/admin/forms")
+      } else {
+        history.push("/admin/formtemplate", { formId: form.parentFormId })
+      }
     }    
+
+    const handleFixedClick = () => {
+      if (fixedClasses === "dropdown") {
+          setFixedClasses("dropdown show");
+      } else {
+           setFixedClasses("dropdown");
+      }
+      }; 
 
 
   return (
@@ -203,7 +221,7 @@ export default function FormTemplate() {
             </CardBody>
             <CardFooter>
               <Button color="info" onClick={handleBackClick}>Back</Button>
-              <Button color="success" onClick={handleSaveForm}>Save</Button>
+              {form.isComplete ? (<Button onClick={() => handleSaveForm('')}>Un-Save</Button>) : (<Button color="success" onClick={() => handleSaveForm('true')}>Save</Button>)}
               <Button color="info" onClick={handleNextClick}>Next</Button>
             </CardFooter>
           </Card>
@@ -222,9 +240,7 @@ export default function FormTemplate() {
                       {
                         subforms.map(subform => (
                           <TableRow className={classes.tableRow} key={subform.id}>
-                            <TableCell className={tableCellClasses}>{subform.name}</TableCell>
-                            <TableCell className={tableCellClasses}>{subform.description}</TableCell>
-                            <TableCell className={tableCellClasses}>
+                          <TableCell className={tableCellClasses}>
                               <Checkbox
                                 checked={subform.isComplete !== ''}
                                 checkedIcon={<Check className={classes.checkedIcon} />}
@@ -234,6 +250,11 @@ export default function FormTemplate() {
                                   root: classes.root
                                 }}
                               />
+                            </TableCell>
+                            <TableCell className={tableCellClasses}>{subform.name}</TableCell>
+                            <TableCell className={tableCellClasses}>{subform.description}</TableCell>
+                            <TableCell className={tableCellClasses}>
+                              
                             </TableCell>
                         </TableRow>
                         ))
