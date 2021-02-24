@@ -1,12 +1,5 @@
 {
-  "auth": {
-    "sevenawarev0246805031": {
-      "service": "Cognito",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [],
-      "customAuth": false
-    }
-  },
+  "auth": {},
   "api": {
     "sevenawarev02": {
       "service": "AppSync",

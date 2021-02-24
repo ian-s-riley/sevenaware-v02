@@ -1,7 +1,7 @@
 import React from "react";
 import {LinkContainer} from 'react-router-bootstrap'
 import classNames from "classnames";
-import { Auth } from "aws-amplify";
+//import { Auth } from "aws-amplify";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -58,7 +58,7 @@ export default function AdminNavbarLinks() {
   };
 
   const handleLogout = () => {
-    Auth.signOut();
+    //Auth.signOut();
   };
 
   return (
