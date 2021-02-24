@@ -139,3 +139,43 @@ export const searchForms = /* GraphQL */ `
     }
   }
 `;
+export const searchFields = /* GraphQL */ `
+  query SearchFields(
+    $filter: SearchableFieldFilterInput
+    $sort: SearchableFieldSortInput
+    $limit: Int
+    $nextToken: String
+    $from: Int
+  ) {
+    searchFields(
+      filter: $filter
+      sort: $sort
+      limit: $limit
+      nextToken: $nextToken
+      from: $from
+    ) {
+      items {
+        id
+        name
+        code
+        description
+        fieldType
+        order
+        value
+        defaultValue
+        options
+        userId
+        lenderId
+        label
+        helpText
+        image
+        formId
+        form
+        createdAt
+        updatedAt
+      }
+      nextToken
+      total
+    }
+  }
+`;

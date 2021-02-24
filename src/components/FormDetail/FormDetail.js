@@ -4,8 +4,8 @@ import { useHistory } from "react-router-dom";
 import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
-import { API } from 'aws-amplify';
-import { listForms, getForm, listFields } from '../../graphql/queries';
+import { API, graphqlOperation } from 'aws-amplify';
+import { searchForms, getForm, searchFields } from '../../graphql/queries';
 import { createForm as createFormMutation, deleteForm as deleteFormMutation, updateForm as updateFormMutation, deleteField as deleteFieldMutation } from '../../graphql/mutations';
 
 // @material-ui/core components
@@ -44,7 +44,8 @@ const initialFormState = {
                           helpDescription: '',
                           legal: '',
                           parentFormId:  '-1', 
-                          parentForm: '' }
+                          parentForm: '',
+                          isArray: '' }
 
 export default function FormDetail() {
   const history = useHistory();
@@ -88,16 +89,29 @@ export default function FormDetail() {
   }  
 
   async function fetchSubforms() {
-    const formsFromAPI = await API.graphql({ 
-      query: listForms, 
-      variables: { filter: {parentFormId: {eq: formId}} }
-    }); 
-    setSubforms(formsFromAPI.data.listForms.items)
+    const apiData = await API.graphql(graphqlOperation(searchForms, {
+      filter: { parentFormId: { match: formId }},
+      sort: {
+        direction: 'asc',
+        field: 'order'
+      }
+    }));
+    const formsFromAPI = apiData.data.searchForms.items 
+    setSubforms(formsFromAPI);  
   }
 
   async function fetchFields() {
-    const fieldsFromAPI = await API.graphql({ query: listFields, variables: { filter: {formId: {eq: formId}} } });
-    setFields(fieldsFromAPI.data.listFields.items);    
+    //const fieldsFromAPI = await API.graphql({ query: listFields, variables: { filter: {formId: {eq: formId}} } });
+    //setFields(fieldsFromAPI.data.listFields.items);    
+    const apiData = await API.graphql(graphqlOperation(searchFields, {
+      filter: { formId: { match: formId }},
+      sort: {
+        direction: 'asc',
+        field: 'order'
+      }
+    }));
+    const fieldsFromAPI = apiData.data.searchFields.items 
+    setFields(fieldsFromAPI);  
   }
 
   async function createForm() {
@@ -359,36 +373,28 @@ export default function FormDetail() {
                   
                 </CardHeader>
                     <CardBody>
-                    <Table className={classes.table}>
-                    <TableHead>
-                        <TableCell className={tableHeadClasses}>
-                        <Button
-                          onClick={handleCreateSubform}
-                          justIcon
-                          small
-                          color="success"
-                          className={classes.marginRight}
-                        >
-                          <Add className={classes.icons} />
-                        </Button>
-                        </TableCell>
-                        <TableCell className={tableHeadClasses}>Subform </TableCell>
-                        <TableCell className={tableHeadClasses}>Description</TableCell>
-                      </TableHead>
+                    <Table className={classes.table}>                    
                       <TableBody>
+                        <TableRow>
+                          <TableCell className={tableCellClasses}>
+                          <Button
+                            onClick={handleCreateSubform}
+                            justIcon
+                            color="success"
+                            className={classes.marginRight}
+                          >
+                            <Add className={classes.icons} />
+                          </Button>
+                          </TableCell>                        
+                          <TableCell className={tableCellClasses}>Subform</TableCell>
+                          <TableCell className={tableCellClasses}>Description</TableCell>
+                          <TableCell className={tableCellClasses}>Order</TableCell>
+                        </TableRow>
                       {
                         subforms.map(subform => (
                           <TableRow className={classes.tableRow} key={subform.id}>
                             <TableCell className={tableCellClasses}>
                                 <>
-                                <Button
-                                  onClick={() => handleSelectSubform(subform)}
-                                  justIcon
-                                  color="success"
-                                  className={classes.marginRight}
-                                >
-                                  <Check className={classes.icons} />
-                                </Button>
                                 <Button
                                   onClick={() => handlePreviewForm(subform)}
                                   justIcon
@@ -397,6 +403,14 @@ export default function FormDetail() {
                                 >
                                   <Find className={classes.icons} />
                                 </Button>
+                                <Button
+                                  onClick={() => handleSelectSubform(subform)}
+                                  justIcon
+                                  color="success"
+                                  className={classes.marginRight}
+                                >
+                                  <Check className={classes.icons} />
+                                </Button>                                
                                 <Button
                                   onClick={() => handleDeleteSubform(subform)}
                                   justIcon
@@ -407,13 +421,13 @@ export default function FormDetail() {
                                 </Button>
                                 </>
                             </TableCell>
-                            <TableCell className={tableCellClasses}>{subform.order} {subform.name}</TableCell>
+                            <TableCell className={tableCellClasses}>{subform.order}</TableCell>
+                            <TableCell className={tableCellClasses}>{subform.name}</TableCell>
                             <TableCell className={tableCellClasses}>{subform.description}</TableCell>                                                           
                         </TableRow>
                         ))
                       }
                       </TableBody>
-
                     </Table>                      
                     </CardBody>
                 </Card>
@@ -437,28 +451,24 @@ export default function FormDetail() {
                         
                         </GridItem>
                       </GridContainer>
-                  
-                  
-                  
-                </CardHeader> 
-                    
+                </CardHeader>                     
                     <CardBody>
-                    <Table className={classes.table}>
-                      <TableHead>
-                        <TableCell className={tableHeadClasses}>
-                        <Button
-                            onClick={handleCreateField}
-                            justIcon
-                            color="success"
-                          >
-                            <Add className={classes.icons} />
-                        </Button>
-                        </TableCell>
-                        <TableCell className={tableHeadClasses}>Field Name</TableCell>
-                        <TableCell className={tableHeadClasses}>Field Type</TableCell>
-                        <TableCell className={tableHeadClasses}>Field ID</TableCell>
-                      </TableHead>
+                    <Table className={classes.table}>                      
                       <TableBody>
+                        <TableRow>
+                          <TableCell className={tableCellClasses}>
+                          <Button
+                              onClick={handleCreateField}
+                              justIcon
+                              color="success"
+                            >
+                              <Add className={classes.icons} />
+                          </Button>
+                          </TableCell>
+                          <TableCell className={tableCellClasses}>Field Name</TableCell>
+                          <TableCell className={tableCellClasses}>Field Type</TableCell>
+                          <TableCell className={tableCellClasses}>Field ID</TableCell>
+                        </TableRow>
                       {
                         fields.map(field => (
                           <TableRow className={classes.tableRow} key={field.id}>                            

@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 
 //AWS Amplify GraphQL libraries
-import { API } from 'aws-amplify';
-import { listForms } from '../../graphql/queries';
+import { API, graphqlOperation } from 'aws-amplify';
+import { searchForms } from '../../graphql/queries';
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
@@ -46,8 +46,16 @@ export default function Forms() {
   }, []);
 
   async function fetchForms() {
-    const apiData = await API.graphql({ query: listForms, variables: { filter: {parentFormId: {eq: '-1'}} } });
-    const formsFromAPI = apiData.data.listForms.items;
+    //const apiData = await API.graphql({ query: searchForms, variables: { filter: {parentFormId: {eq: '-1'}} } });
+    //const formsFromAPI = apiData.data.listForms.items;
+    const apiData = await API.graphql(graphqlOperation(searchForms, {
+      filter: { parentFormId: { match: "-1" }},
+      sort: {
+        direction: 'asc',
+        field: 'name'
+      }
+    }));
+    const formsFromAPI = apiData.data.searchForms.items 
     setForms(formsFromAPI);    
   }
   
