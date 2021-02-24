@@ -1,6 +1,6 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-//import { withAuthenticator } from '@aws-amplify/ui-react'
+import { withAuthenticator } from '@aws-amplify/ui-react'
 // creates a beautiful scrollbar
 import PerfectScrollbar from "perfect-scrollbar";
 import "perfect-scrollbar/css/perfect-scrollbar.css";
@@ -111,5 +111,5 @@ function Admin({ ...rest }) {
   );
 }
 
-export default Admin;
-//export default withAuthenticator(Admin);
+//export default Admin;
+export default withAuthenticator(Admin)
